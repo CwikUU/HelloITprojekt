@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
@@ -9,17 +10,21 @@ public class EnemyAI : MonoBehaviour
         Roaming,
         Waiting,
         Returning,
+        Chasing,
     }
 
+    [SerializeField] private float speed = 2f; // Speed of the enemy
     [SerializeField] private float roamRadius = 5f; // Radius within which the enemy roams
     [SerializeField] private float roamTime = 2f; // Speed of the enemy while roaming
     [SerializeField] private float waitTime = 2f; // Time to wait at each roaming position
     [SerializeField] private float howFar = 2; // How far the enemy can roam from the start position
+    public GameObject player; 
     private State state;
     private EnemyPathfinding enemyPathfinding;
     private Vector2 startPosition;
     private Vector2 roamPosition;
     private Vector2 enemyPosition;
+    private Transform target;
 
     private void Awake()
     {
@@ -37,8 +42,29 @@ public class EnemyAI : MonoBehaviour
     private void Update()
     {
         enemyPosition = transform.position;
-        //InRoamingZone();
+        if (target !=null)
+        {
+            float step = speed * Time.deltaTime;
+            transform.position = Vector2.MoveTowards(transform.position, target.position, step);
+        }
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            target = other.transform;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            target = null;
+        }
+    }
+
     private IEnumerator EnemyRoutine()
     {
         while (true)
