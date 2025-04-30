@@ -1257,7 +1257,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.45, y: -30, z: -10}
+  m_LocalPosition: {x: -0.008038998, y: -33.9552, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2792,6 +2792,11 @@ MonoBehaviour:
   howFar: 1
   stopDistance: 0
   player: {fileID: 1633717353}
+--- !u!4 &876886649 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8862768231608573177, guid: 82eb293af20b68b48a18967ccdd962f2, type: 3}
+  m_PrefabInstance: {fileID: 876886642}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &887416248
 GameObject:
   m_ObjectHideFlags: 0
@@ -16256,7 +16261,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.7671933
+  m_Mass: 10000
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 0
@@ -16719,7 +16724,7 @@ MonoBehaviour:
   m_Priority: 10
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 0}
-  m_Follow: {fileID: 784717195}
+  m_Follow: {fileID: 876886649}
   m_Lens:
     FieldOfView: 34
     OrthographicSize: 5
@@ -16748,7 +16753,7 @@ Transform:
   m_GameObject: {fileID: 1721085034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.45, y: -30, z: -10}
+  m_LocalPosition: {x: -0.008038998, y: -33.9552, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
