@@ -32,3 +32,8 @@ od 13.00 do 16.30 - cos troche w tym chodzeniu przeciwnika, pozniej nauka unity
 09.09
 
 11.30 do 15.15 - 4 te stany zrobione s
+
+15.09
+
+16.00 do 17 - pathfinding
+
