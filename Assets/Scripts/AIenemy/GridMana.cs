@@ -33,10 +33,32 @@ public class GridMana : MonoBehaviour
             {
                 Vector3 worldPoint = bottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.up * (y * nodeDiameter + nodeRadius); // Obliczenie pozycji wêz³a w œwiecie
                 bool walkable = !Physics2D.OverlapCircle(worldPoint, nodeRadius, unwalkableMask); // Sprawdzenie, czy wêze³ jest przechodni (czy nie koliduje z obiektami nieprzechodnimi)
-                grid[x, y] = new Node(walkable, worldPoint); // Utworzenie nowego wêz³a i przypisanie go do tablicy
+                grid[x, y] = new Node(walkable, worldPoint, x , y); // Utworzenie nowego wêz³a i przypisanie go do tablicy
             }
         }
     }
+
+    public List<Node> GetNeighbours(Node node)
+    {
+        List<Node> neighbours = new List<Node>(); // Lista s¹siaduj¹cych wêz³ów
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0) continue; // Pomijanie samego wêz³a
+                
+                int checkX = node.gridX + x; // Obliczenie indeksu wêz³a w poziomie
+                int checkY = node.gridY + y; // Obliczenie indeksu wêz³a w pionie
+                
+                // Sprawdzenie, czy indeksy s¹ w granicach siatki
+                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
+                {
+                    neighbours.Add(grid[checkX, checkY]); // Dodanie s¹siaduj¹cego wêz³a do listy
+                }
+            }
+        }
+        return neighbours; // Zwrócenie listy s¹siaduj¹cych wêz³ów
+    } 
 
     public Node NodeFromWorldPoint(Vector3 worldPosition)
     {
@@ -53,6 +75,8 @@ public class GridMana : MonoBehaviour
         return grid[x, y]; // Zwrócenie wêz³a z tablicy
     }
 
+
+    public List<Node> path;
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
@@ -71,10 +95,15 @@ public class GridMana : MonoBehaviour
                     {
                         Gizmos.color = Color.green; // Zmiana koloru wêz³a gracza na zielony
                     }
+                    if (path != null)
+                        if (path.Contains(n))
+                        {
+                            Gizmos.color = Color.blue; // Zmiana koloru wêz³a na niebieski, jeœli jest czêœci¹ œcie¿ki
+                        }
                     // Rysuj wêz³y jako p³askie kwadraty w p³aszczyŸnie XY
                     Gizmos.DrawCube(
                         new Vector3(n.worldPosition.x, n.worldPosition.y, 0f),
-                        new Vector3(nodeDiameter - 0.1f, nodeDiameter - 0.1f, 0.05f)
+                        new Vector3(nodeDiameter - 0.2f, nodeDiameter - 0.2f, 0.05f)
                     );
                 }
             }
