@@ -29,11 +29,31 @@ od 13.00 do 16.30 - cos troche w tym chodzeniu przeciwnika, pozniej nauka unity
 
 11.00 do 14.00 - sciganie dziala pog
 
-09.09
+09.05
 
 11.30 do 15.15 - 4 te stany zrobione s
 
-15.09
+15.05
 
 16.00 do 17 - pathfinding
 
+27.05
+
+9.30 do 16.00 - pathfinding
+
+28.05
+
+11.00 do 14.00 - pathfinding
+
+30.05
+
+11.30 do 13.30 - pathfinding
+
+31.05
+
+10.00 do 14.00 - pathfinding
+15.30 do 17.30 - pathfinding
+
+1.06
+
+13.00 - 18.30 - pathfinding

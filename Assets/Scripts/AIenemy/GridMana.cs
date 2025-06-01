@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class GridMana : MonoBehaviour
 {
+    [SerializeField] private bool showOnlyPath;
     public Transform player;
     public LayerMask unwalkableMask; // Maska warstwy, która okreœla, które obiekty s¹ nieprzechodnie
     public Vector2 gridWorldSize; // Rozmiar siatki w œwiecie
@@ -20,6 +21,14 @@ public class GridMana : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter); // Obliczenie rozmiaru siatki w poziomie
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter); // Obliczenie rozmiaru siatki w pionie
         CreateGrid(); // Utworzenie siatki
+    }
+
+    public int MaxSize
+    {
+        get
+        {
+            return gridSizeX * gridSizeY; // Zwrócenie maksymalnego rozmiaru siatki
+        }
     }
 
     private void CreateGrid()
@@ -83,28 +92,50 @@ public class GridMana : MonoBehaviour
         // Rysuj ramkê siatki w przestrzeni 2D (X, Y)
         Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, gridWorldSize.y, 0.1f));
 
-        if (grid != null)
+        if (showOnlyPath)
         {
-            for (int x = 0; x < gridSizeX; x++)
+            if (path != null)
             {
-                Node playerNode = NodeFromWorldPoint(player.position);
-                foreach (Node n in grid)
+                foreach (Node n in path)
                 {
-                    Gizmos.color = n.walkable ? Color.white : Color.red;
-                    if (n == playerNode)
-                    {
-                        Gizmos.color = Color.green; // Zmiana koloru wêz³a gracza na zielony
-                    }
-                    if (path != null)
-                        if (path.Contains(n))
-                        {
-                            Gizmos.color = Color.blue; // Zmiana koloru wêz³a na niebieski, jeœli jest czêœci¹ œcie¿ki
-                        }
-                    // Rysuj wêz³y jako p³askie kwadraty w p³aszczyŸnie XY
+                    Gizmos.color = Color.black;
                     Gizmos.DrawCube(
                         new Vector3(n.worldPosition.x, n.worldPosition.y, 0f),
                         new Vector3(nodeDiameter - 0.2f, nodeDiameter - 0.2f, 0.05f)
                     );
+                }
+            }
+        }
+        else
+        {
+
+            if (grid != null)
+            {
+                for (int x = 0; x < gridSizeX; x++)
+                {
+                    Node playerNode = NodeFromWorldPoint(player.position);
+                    foreach (Node n in grid)
+                    {
+                        Gizmos.color = n.walkable ? Color.white : Color.red;
+                        if (n == playerNode)
+                        {
+                            Gizmos.color = Color.green; // Zmiana koloru wêz³a gracza na zielony
+                        }
+
+                        if(path != null)
+                        {
+                            if (path.Contains(n))
+                            {
+                                Gizmos.color = Color.black; // Zmiana koloru wêz³a na czarny, jeœli jest czêœci¹ œcie¿ki
+                            }
+                        }
+
+                        // Rysuj wêz³y jako p³askie kwadraty w p³aszczyŸnie XY
+                        Gizmos.DrawCube(
+                            new Vector3(n.worldPosition.x, n.worldPosition.y, 0f),
+                            new Vector3(nodeDiameter - 0.2f, nodeDiameter - 0.2f, 0.05f)
+                        );
+                    }
                 }
             }
         }
