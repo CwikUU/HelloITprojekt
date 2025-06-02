@@ -81,8 +81,6 @@ public class Proba : MonoBehaviour
             inThis = true;
             target = other.transform;
             state = State.Chasing;
-
-            waypoints = pathfinding.FindPatch(transform.position, target.position);
             waypointIndex = 0; // Reset the waypoint index when entering the trigger
             Debug.Log("wszedl ");
         }
@@ -133,11 +131,11 @@ public class Proba : MonoBehaviour
 
                 float step = speed * Time.deltaTime;
                 transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-                Debug.Log("Enemy is roaming towards waypoint: " + waypointIndex + " at position: " + waypoints[waypointIndex]);
+                //Debug.Log("Enemy is roaming towards waypoint: " + waypointIndex + " at position: " + waypoints[waypointIndex]);
             if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
                 {
                     waypointIndex++;
-                    Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
+                    //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
                 }
 
                 if (Vector2.Distance(currentPosition, roamPosition) < 0.1f)
@@ -149,7 +147,7 @@ public class Proba : MonoBehaviour
 
             if (waypoints != null && waypointIndex >= waypoints.Length)
         {
-            Debug.Log("Enemy has reached the roaming position.");
+            //Debug.Log("Enemy has reached the roaming position.");
             state = State.Waiting;
             waypoints = null; // Clear waypoints after reaching the roaming position
         }
@@ -160,7 +158,32 @@ public class Proba : MonoBehaviour
     private void Chasing()
     {
         Debug.Log("sciga" + state);
-        
+        waypointIndex = 0; // Reset the waypoint index when chasing the player
+        if (target != null)
+        {
+            waypoints = pathfinding.FindPatch(transform.position, target.position);
+
+            if (Vector2.Distance(currentPosition, target.position) > stopDistance && inThis)
+            {
+                if (waypoints != null && waypointIndex < waypoints.Length)
+                {
+
+                    Debug.Log("scigam");
+                    float step = speed * Time.deltaTime;
+
+                    transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
+                    if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
+                    {
+                        waypointIndex++;
+                        Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
+                    }
+                }
+            }
+        }
+        else
+        {
+            waypoints = pathfinding.FindPatch(transform.position, lastPlayerPosition);
+        }
 
         if (!inThis)
         {
@@ -177,34 +200,22 @@ public class Proba : MonoBehaviour
                     waypointIndex++;
                     Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
                 }
+            }
 
-                if (Vector2.Distance(currentPosition, lastPlayerPosition) == 0f)
+                if (waypoints != null && waypointIndex >= waypoints.Length)
                 {
                     isReturning = true;
                     roamPosition = Vector2.zero; // Reset roam position when returning
                     //state = State.Returning; // wraca do miejsca startowego trza zrobic
+                    waypoints = null; // Clear waypoints when returning
+                    waypointIndex = 0; // Reset the waypoint index when returning
                     state = State.Roaming; // Idzie do innego miejsca w patrolu
                     Debug.Log("Enemy has stopped chasing the player." + state);
                 }
-            }
+            
         }
-
-        if (Vector2.Distance(currentPosition, target.position) > stopDistance && inThis)
-        {
-            if (waypoints != null && waypointIndex < waypoints.Length)
-            {
-
-                Debug.Log("scigam");
-                float step = speed * Time.deltaTime;
-
-                transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-                if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
-                {
-                    waypointIndex++;
-                    Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
-                }
-            }
-        }
+        
+        
     }
 
     private void Returning()
