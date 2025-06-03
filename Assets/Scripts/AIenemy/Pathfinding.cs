@@ -81,21 +81,29 @@ public class Pathfinding : MonoBehaviour
             path.Add(currentNode); // Dodaj bie¿¹cy wêze³ do œcie¿ki
             currentNode = currentNode.parent; // PrzejdŸ do rodzica bie¿¹cego wêz³a
         }
-        path.Reverse(); // Odwróæ œcie¿kê, aby uzyskaæ poprawny kierunek od startu do koñca
 
-        grid.path = path; // Przypisz znalezion¹ œcie¿kê do siatki
-
-        // Zwróæ tablicê pozycji 2D
-        Vector2[] waypoints = new Vector2[path.Count];
-        for (int i = 0; i < path.Count; i++)
-        {
-            waypoints[i] = new Vector2(path[i].worldPosition.x, path[i].worldPosition.y);
-        }
         
+        Vector2[] waypoints = SimplifyPath(path); // Uproœæ œcie¿kê do punktów nawigacyjnych
+        Array.Reverse(waypoints); // Odwróæ kolejnoœæ punktów, aby zaczynaæ od wêz³a startowego
+
         return waypoints;
     }
 
-    
+    Vector2[] SimplifyPath(List<Node> path)
+    {
+        List<Vector2> waypoints = new List<Vector2>(); // Lista do przechowywania punktów nawigacyjnych
+        Vector2 directionOld = Vector2.zero; // Poprzedni kierunek, pocz¹tkowo zerowy
+        for (int i = 1; i < path.Count; i++) // Iteruj przez ka¿dy wêze³ w œcie¿ce
+        {
+            Vector2 directionNew = new Vector2(path[i - 1].gridX - path[i].gridX, path[i - 1].gridY - path[i].gridY);
+            if (directionNew != directionOld) // Jeœli to pierwszy wêze³ lub odleg³oœæ do ostatniego punktu jest wiêksza ni¿ 0.1
+            {
+                waypoints.Add(path[i].worldPosition); // Dodaj bie¿¹cy punkt do listy punktów nawigacyjnych
+            }
+            directionOld = directionNew;
+        }
+        return waypoints.ToArray(); // Zwróæ tablicê punktów nawigacyjnych
+    }
 
     int GetDistance(Node nodeA, Node nodeB)
     {

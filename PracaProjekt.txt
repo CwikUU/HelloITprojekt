@@ -61,3 +61,7 @@ od 13.00 do 16.30 - cos troche w tym chodzeniu przeciwnika, pozniej nauka unity
 2.06
 
 10.00 - 11.00 - pathfinding
+
+3.06
+
+13.00 - 16.00 - pathfinding

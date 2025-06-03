@@ -131,7 +131,7 @@ public class Proba : MonoBehaviour
 
                 float step = speed * Time.deltaTime;
                 transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-                //Debug.Log("Enemy is roaming towards waypoint: " + waypointIndex + " at position: " + waypoints[waypointIndex]);
+                Debug.Log("Enemy is roaming towards waypoint: " + waypointIndex + " at position: " + waypoints[waypointIndex]);
             if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
                 {
                     waypointIndex++;
@@ -255,5 +255,7 @@ public class Proba : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(startPosition, new Vector2(howFarX * 2, howFarY * 2)); // Draw a wireframe cube around the roaming area
         }
+
+
     }
 }

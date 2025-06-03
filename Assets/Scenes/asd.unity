@@ -4419,7 +4419,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  waitTime: 1
+  waitTime: 0
   draw: 0
   howFarX: 12
   howFarY: 8
