@@ -20,6 +20,8 @@ public class Proba : MonoBehaviour
     [SerializeField] private float howFarX, howFarY;// How far the enemy can roam from the start position
     [Range(0, 5)]
     [SerializeField] private float stopDistance;
+    [Range(0, 5)]
+    [SerializeField] private float turnDistance; // Distance to turn when following the path
     public GameObject player;
     private State state;
     private Vector2 startPosition;
@@ -30,9 +32,11 @@ public class Proba : MonoBehaviour
     private bool inThis = false;
     private float waitingTime = 0f;
     private Pathfinding pathfinding;
+    private Path path;
     private Vector2[] waypoints;
     private int waypointIndex = 0;
     private bool isReturning = false;
+    private bool followingPath = true;
 
     private void Awake()
     {
@@ -122,7 +126,8 @@ public class Proba : MonoBehaviour
         {
             roamPosition = GetRoamingPosition();
             waypoints = pathfinding.FindPatch(transform.position, roamPosition); // Get waypoints to the new roaming position
-            waypointIndex = 0; // Reset the waypoint index when getting a new roaming position
+            path = new Path(waypoints, transform.position, turnDistance);
+            int pathIndex = 0; // Reset the path index when roaming to a new position
         }
 
         
@@ -248,6 +253,30 @@ public class Proba : MonoBehaviour
 
     }
 
+    private void FollowPath()
+    {
+        followingPath = true; // Flag to check if the enemy is following the path
+        int pathIndex = 0; // Index to track the current waypoint in the path
+        transform.LookAt(path.lookPoints[0]); // Look at the first waypoint in the path
+
+        if (followingPath)
+        {
+            Vector2 pos = new Vector2(transform.position.x, transform.position.y);
+            if (path.turnBoundries[pathIndex].HasCrossedLine(pos))
+            {
+                if (pathIndex >= path.finishLineIndex)
+                {
+                    followingPath = false; // Stop following the path if all waypoints are reached
+                    Debug.Log("Enemy has reached the end of the path.");
+                }
+                else
+                {
+                    pathIndex++; // Move to the next waypoint in the path
+                }
+            }
+        }
+    }
+
     private void OnDrawGizmos()
     {
         if (draw)
@@ -256,6 +285,9 @@ public class Proba : MonoBehaviour
             Gizmos.DrawWireCube(startPosition, new Vector2(howFarX * 2, howFarY * 2)); // Draw a wireframe cube around the roaming area
         }
 
-
+        if (path != null)
+        {
+            path.DrawWithGizmos(); // Draw the path with Gizmos
+        }
     }
 }

@@ -4424,6 +4424,7 @@ MonoBehaviour:
   howFarX: 12
   howFarY: 8
   stopDistance: 0.6
+  turnDistance: 5
   player: {fileID: 451742362}
 --- !u!58 &1008488705
 CircleCollider2D:
