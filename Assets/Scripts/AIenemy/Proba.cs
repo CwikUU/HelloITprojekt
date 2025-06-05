@@ -11,6 +11,7 @@ public class Proba : MonoBehaviour
         Waiting,
         Returning,
         Chasing,
+        Attacking,
     }
     [Range(0, 10)]
     [SerializeField] private float speed; // Speed of the enemy
@@ -20,7 +21,10 @@ public class Proba : MonoBehaviour
     [SerializeField] private float howFarX, howFarY;// How far the enemy can roam from the start position
     [Range(0, 5)]
     [SerializeField] private float stopDistance;
+    [SerializeField] private LayerMask wallLayer;
     public GameObject player;
+    public Transform attackPoint;
+    public LayerMask playerLayer;
     private State state;
     private Vector2 startPosition;
     private Vector2 roamPosition;
@@ -33,12 +37,19 @@ public class Proba : MonoBehaviour
     private Vector2[] waypoints;
     private int waypointIndex = 0;
     private bool isReturning = false;
+    private Animator anim;
+    float lastX;
+    float timer;
+    private Coroutine waitingCoroutine;
 
     private void Awake()
     {
+        lastPlayerPosition = transform.position;
         state = State.Roaming;
         startPosition = transform.position;
         pathfinding = FindObjectOfType<Pathfinding>();
+        player = GameObject.FindGameObjectWithTag("Player");
+        anim = GetComponent<Animator>();
     }
 
     private void Start()
@@ -50,8 +61,33 @@ public class Proba : MonoBehaviour
     private void Update()
     {
         currentPosition = transform.position;
+        //Debug.Log(state+"stastsatasdtdastasdtadstdasg");
         //Debug.Log("target position: " + currentPosition + roamPosition+inThis+state+ Vector2.Distance(currentPosition, roamPosition));
         EnemyRoutine();
+        CheckForPlayer(); // Check for player in the trigger area
+
+        float curX = transform.position.x;
+        if (curX > lastX)
+        {
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * -1;
+            transform.localScale = scale;
+        }
+        else if (curX < lastX)
+        {
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Abs(scale.x);
+            transform.localScale = scale;
+        }
+
+        lastX = curX;
+
+        if (timer > 0)
+        {
+            timer -= Time.deltaTime;
+            //Debug.Log(timer + "," + isReturning);
+        }
+        else if (timer <= 0) timer = 0;
     }
 
     public void EnemyRoutine()
@@ -60,63 +96,77 @@ public class Proba : MonoBehaviour
         {   
             case State.Roaming:
                 Roaming();
+
                 break;
             case State.Waiting:
-                Waiting();
                 break;
             case State.Returning:
                 Returning();
                 break;
             case State.Chasing:
+                StopCoroutine(Waiting()); // Stop waiting coroutine if chasing
                 Chasing();
+                break;
+            case State.Attacking:
                 break;
         }   
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void CheckForPlayer()
     {
-        if (other.gameObject.tag == "Player")
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 5f, playerLayer);
+        if (hitColliders.Length > 0)
         {
-            
-            inThis = true;
-            target = other.transform;
-            state = State.Chasing;
-            waypointIndex = 0; // Reset the waypoint index when entering the trigger
-            Debug.Log("wszedl ");
-        }
-    }
+            Transform playerTransform = hitColliders[0].transform;
+            RaycastHit2D hit = Physics2D.Linecast(transform.position, playerTransform.position, wallLayer);
+            if (hit.collider == null)
+            {
+                inThis = true;
+                target = playerTransform;
+                if (state != State.Chasing && state != State.Attacking) state = State.Chasing;
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.gameObject.tag == "Player")
+                waypointIndex = 0; // Reset the waypoint index when entering the trigger
+                                   //Debug.Log("wszedl ");
+            }
+            else
+            {
+                if (target != null) lastPlayerPosition = new Vector2(target.position.x, target.position.y);
+                inThis = false;
+                target = null; // If there's a wall between the enemy and the player, set target to null
+            }
+        }
+
+        if (hitColliders.Length == 0)
         {
-            
-            lastPlayerPosition = new Vector2(target.position.x,target.position.y);
+            if(target!=null) lastPlayerPosition = new Vector2(target.position.x, target.position.y);
             target = null;
-            inThis = false; 
-            Debug.Log("wyszedl");
+            inThis = false;
+            //Debug.Log("wyszedl");
         }
     }
 
-    private void Waiting()
+    
+
+    private IEnumerator Waiting()
     {
-        Debug.Log("Waiting state: " );
-        if (waitingTime < waitTime)
-        {
-            waitingTime += Time.deltaTime;
-        }
-        else
-        {
-            waitingTime = 0f;
-            state = State.Roaming; // After waiting, go back to roaming
-            roamPosition = Vector2.zero;
-        }
+        //Debug.Log("Waiting state: " );
+        yield return new WaitForSeconds(waitTime); // Czekaj okreœlony czas
+        waitingTime = 0f;
+        state = State.Roaming;
+        roamPosition = Vector2.zero;
+        waitingCoroutine = null;
+        Debug.Log("Enemy has finished waiting and is now roaming again." + state);
     }
 
     private void Roaming()
     {
         state = State.Roaming;
-        Debug.Log("Roaming state: ");
+        //Debug.Log("Roaming state: ");
+        if (waitingCoroutine != null)
+        {
+            StopCoroutine(waitingCoroutine);
+            waitingCoroutine = null;
+        }
 
         if (roamPosition == Vector2.zero)
         {
@@ -145,19 +195,27 @@ public class Proba : MonoBehaviour
                 }
             }
 
-            if (waypoints != null && waypointIndex >= waypoints.Length)
+        if (waypoints != null && waypointIndex >= waypoints.Length)
         {
-            //Debug.Log("Enemy has reached the roaming position.");
+            Debug.Log("Enemy has reached the roaming position.");
             state = State.Waiting;
-            waypoints = null; // Clear waypoints after reaching the roaming position
+            if (waitingCoroutine == null)
+                waitingCoroutine = StartCoroutine(Waiting());
+            waypoints = null;
         }
-        
+
 
     }
 
     private void Chasing()
     {
-        Debug.Log("sciga" + state);
+
+        if (waitingCoroutine != null)
+        {
+            StopCoroutine(waitingCoroutine);
+            waitingCoroutine = null;
+        }
+        //Debug.Log("sciga" + state);
         waypointIndex = 0; // Reset the waypoint index when chasing the player
         if (target != null)
         {
@@ -168,7 +226,7 @@ public class Proba : MonoBehaviour
                 if (waypoints != null && waypointIndex < waypoints.Length)
                 {
 
-                    Debug.Log("scigam");
+                    //Debug.Log("scigam");
                     float step = speed * Time.deltaTime;
 
                     transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
@@ -178,6 +236,16 @@ public class Proba : MonoBehaviour
                         Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
                     }
                 }
+            }
+            if (Vector2.Distance(currentPosition,target.position) <= stopDistance && timer == 0)
+            {
+                Debug.Log("Enemy is close enough to the player, switching to attacking state.");
+                
+                
+                state = State.Attacking; // If close enough to the player, switch to waiting state
+                anim.SetBool("isAttacking", true);
+                timer = 3;
+                //StartCoroutine(Attack()); // Call the attack method (you can implement this method to handle the attack logic)
             }
         }
         else
@@ -239,6 +307,13 @@ public class Proba : MonoBehaviour
 
     }
 
+    public void ChangeAnime()
+    {
+        anim.SetBool("isAttacking", false);
+        state = State.Chasing; // Ensure the state is set to Chasing if it was previously Attacking
+        //Debug.Log("Changing animation to chasing state:hgda ukgfuygdausdgbjagdhgashjdgfajyfdhawftdyfagwhdvhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + state);
+    }
+
     private Vector2 GetRoamingPosition()
     {
         return new Vector2(
@@ -247,6 +322,8 @@ public class Proba : MonoBehaviour
         );
 
     }
+
+   
 
     private void OnDrawGizmos()
     {

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class GridMana : MonoBehaviour
 {
+    [SerializeField] private bool showPath;
     [SerializeField] private bool showOnlyPath;
     public Transform player;
     public LayerMask unwalkableMask; // Maska warstwy, która okreœla, które obiekty s¹ nieprzechodnie
@@ -106,7 +107,7 @@ public class GridMana : MonoBehaviour
                 }
             }
         }
-        else
+        else if (showPath) // Jeœli showPath jest true, rysuj wszystkie wêz³y
         {
 
             if (grid != null)
@@ -122,7 +123,7 @@ public class GridMana : MonoBehaviour
                             Gizmos.color = Color.green; // Zmiana koloru wêz³a gracza na zielony
                         }
 
-                        if(path != null)
+                        if (path != null)
                         {
                             if (path.Contains(n))
                             {

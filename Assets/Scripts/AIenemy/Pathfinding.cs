@@ -23,8 +23,7 @@ public class Pathfinding : MonoBehaviour
 
     public Vector2[] FindPatch(Vector2 startPos, Vector2 targetPos)
     {
-        Stopwatch stopwatch = new Stopwatch(); // Utwórz nowy obiekt Stopwatch do pomiaru czasu
-        stopwatch.Start(); // Rozpocznij pomiar czasu
+        
         Node startNode = grid.NodeFromWorldPoint(startPos); // Pobierz wêze³ startowy na podstawie pozycji startowej
         Node targetNode = grid.NodeFromWorldPoint(targetPos); // Pobierz wêze³ docelowy na podstawie pozycji docelowej
 
@@ -41,8 +40,8 @@ public class Pathfinding : MonoBehaviour
 
             if (currentNode == targetNode)
             {
-                stopwatch.Stop(); // Zatrzymaj pomiar czasu
-                UnityEngine.Debug.Log("Path found in: " + stopwatch.ElapsedMilliseconds + " ms"); // Wyœwietl czas znalezienia œcie¿ki
+                
+               
                 return RetracePath(startNode, targetNode); // Jeœli osi¹gniêto wêze³ docelowy, zakoñcz przeszukiwanie
             }
 
