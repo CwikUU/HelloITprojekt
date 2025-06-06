@@ -7,7 +7,7 @@ public class Enemy_Health : MonoBehaviour
 {
     public int maxHealth = 3;
     private int currentHealth;
-    [SerializeField] private float untouchable = 1f;
+    [SerializeField] private float untouchable = .5f;
 
     private void Update()
     {

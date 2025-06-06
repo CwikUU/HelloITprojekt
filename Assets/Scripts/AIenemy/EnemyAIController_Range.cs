@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 
-public class Proba : MonoBehaviour
+public class EnemyAIController_Range : MonoBehaviour
 {
-    private enum State
+    public enum State
     {
         Roaming,
         Waiting,
@@ -22,10 +23,10 @@ public class Proba : MonoBehaviour
     [Range(0, 5)]
     [SerializeField] private float stopDistance;
     [SerializeField] private LayerMask wallLayer;
+    private Enemy_AttackShot enemyShot;
     public GameObject player;
-    public Transform attackPoint;
     public LayerMask playerLayer;
-    private State state;
+    public State state;
     private Vector2 startPosition;
     private Vector2 roamPosition;
     private Vector2 currentPosition;
@@ -36,14 +37,18 @@ public class Proba : MonoBehaviour
     private Pathfinding pathfinding;
     private Vector2[] waypoints;
     private int waypointIndex = 0;
-    private bool isReturning = false;
     private Animator anim;
     float lastX;
-    float timer;
+    [SerializeField] public float attackCD;
+    [HideInInspector] public float attackCDtimer;
     private Coroutine waitingCoroutine;
+    private float facingDirection = 1f;
+    [HideInInspector]public Vector2 targetpos;
+    [SerializeField]private Transform turret;
 
     private void Awake()
     {
+        enemyShot = GetComponent<Enemy_AttackShot>();
         lastPlayerPosition = transform.position;
         state = State.Roaming;
         startPosition = transform.position;
@@ -55,7 +60,7 @@ public class Proba : MonoBehaviour
     private void Start()
     {
         
-        Debug.Log("Enemy AI started at position: " + startPosition);
+        //Debug.Log("Enemy AI started at position: " + startPosition);
     }
 
     private void Update()
@@ -67,27 +72,38 @@ public class Proba : MonoBehaviour
         CheckForPlayer(); // Check for player in the trigger area
 
         float curX = transform.position.x;
-        if (curX > lastX)
+        float delta = curX - lastX;
+        if (Mathf.Abs(delta) > .01f)
         {
-            Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x) * -1;
-            transform.localScale = scale;
+            if ((delta > 0 && facingDirection == 1) || (delta < 0 && facingDirection == -1))
+            {
+                facingDirection *= -1; // Flip the facing direction
+                Vector3 scale = transform.localScale;
+                scale.x *= -1;
+                transform.localScale = scale;
+                turret.localScale = scale;
+            }
         }
-        else if (curX < lastX)
-        {
-            Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x);
-            transform.localScale = scale;
-        }
-
         lastX = curX;
 
-        if (timer > 0)
+        if (target != null)
         {
-            timer -= Time.deltaTime;
-            //Debug.Log(timer + "," + isReturning);
+            Vector2 direction = (target.position - transform.position).normalized;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            turret.rotation = Quaternion.Euler(new Vector3(0, 0, angle)); // Rotate the shot point to face the target
         }
-        else if (timer <= 0) timer = 0;
+        else if (lastPlayerPosition != null && roamPosition == Vector2.zero)
+        {
+            Vector2 direction = (lastPlayerPosition - (Vector2)transform.position);
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            turret.rotation = Quaternion.Euler(new Vector3(0, 0, angle)); // Rotate the shot point to face the last known player position
+        }
+        else if (roamPosition != Vector2.zero)
+        {
+            Vector2 direction = (roamPosition - (Vector2)transform.position);
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            turret.rotation = Quaternion.Euler(new Vector3(0, 0, angle)); // Rotate the shot point to face the roaming position
+        }
     }
 
     public void EnemyRoutine()
@@ -155,7 +171,7 @@ public class Proba : MonoBehaviour
         state = State.Roaming;
         roamPosition = Vector2.zero;
         waitingCoroutine = null;
-        Debug.Log("Enemy has finished waiting and is now roaming again." + state);
+        //Debug.Log("Enemy has finished waiting and is now roaming again." + state);
     }
 
     private void Roaming()
@@ -197,11 +213,12 @@ public class Proba : MonoBehaviour
 
         if (waypoints != null && waypointIndex >= waypoints.Length)
         {
-            Debug.Log("Enemy has reached the roaming position.");
+            //Debug.Log("Enemy has reached the roaming position.");
             state = State.Waiting;
             if (waitingCoroutine == null)
                 waitingCoroutine = StartCoroutine(Waiting());
             waypoints = null;
+            roamPosition = Vector2.zero; // Reset roam position when reaching the roaming position
         }
 
 
@@ -209,7 +226,7 @@ public class Proba : MonoBehaviour
 
     private void Chasing()
     {
-
+        
         if (waitingCoroutine != null)
         {
             StopCoroutine(waitingCoroutine);
@@ -233,19 +250,18 @@ public class Proba : MonoBehaviour
                     if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
                     {
                         waypointIndex++;
-                        Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
+                        //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
                     }
                 }
             }
-            if (Vector2.Distance(currentPosition,target.position) <= stopDistance && timer == 0)
+            if (Vector2.Distance(currentPosition,target.position) <= stopDistance && attackCDtimer  <=0)
             {
-                Debug.Log("Enemy is close enough to the player, switching to attacking state.");
+                //Debug.Log("Enemy is close enough to the player, switching to attacking state.");
                 
+                targetpos = target.position;
+                //state = State.Attacking; // If close enough to the player, switch to waiting state
+                enemyShot.StartShot();
                 
-                state = State.Attacking; // If close enough to the player, switch to waiting state
-                anim.SetBool("isAttacking", true);
-                timer = 3;
-                //StartCoroutine(Attack()); // Call the attack method (you can implement this method to handle the attack logic)
             }
         }
         else
@@ -259,26 +275,26 @@ public class Proba : MonoBehaviour
             {
 
 
-                Debug.Log("znikl");
+                //Debug.Log("znikl");
                 float step = speed * Time.deltaTime;
                 transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
 
                 if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
                 {
                     waypointIndex++;
-                    Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
+                    //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
                 }
             }
 
                 if (waypoints != null && waypointIndex >= waypoints.Length)
                 {
-                    isReturning = true;
+                    
                     roamPosition = Vector2.zero; // Reset roam position when returning
                     //state = State.Returning; // wraca do miejsca startowego trza zrobic
                     waypoints = null; // Clear waypoints when returning
                     waypointIndex = 0; // Reset the waypoint index when returning
                     state = State.Roaming; // Idzie do innego miejsca w patrolu
-                    Debug.Log("Enemy has stopped chasing the player." + state);
+                    //Debug.Log("Enemy has stopped chasing the player." + state);
                 }
             
         }
@@ -301,20 +317,13 @@ public class Proba : MonoBehaviour
         {
             Debug.Log("Enemy has returned to start position.");
             roamPosition = Vector2.zero;
-            isReturning = false;
             state = State.Roaming; // After returning, go back to roaming
         }
 
     }
 
-    public void ChangeAnime()
-    {
-        anim.SetBool("isAttacking", false);
-        state = State.Chasing; // Ensure the state is set to Chasing if it was previously Attacking
-        //Debug.Log("Changing animation to chasing state:hgda ukgfuygdausdgbjagdhgashjdgfajyfdhawftdyfagwhdvhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + state);
-    }
-
-    private Vector2 GetRoamingPosition()
+    
+    public Vector2 GetRoamingPosition()
     {
         return new Vector2(
             Random.Range(startPosition.x-howFarX, startPosition.x + howFarX),

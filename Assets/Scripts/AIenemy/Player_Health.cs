@@ -9,6 +9,7 @@ public class Player_Health : MonoBehaviour
 {
     public int maxHealth = 5;
     private int currentHealth;
+    private Vector2 startPos;
 
     private GameObject player;
     public TMP_Text healtText;
@@ -16,17 +17,11 @@ public class Player_Health : MonoBehaviour
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        startPos = player.transform.position;
         currentHealth = maxHealth;
         healtText.text = "HP: " + currentHealth /*+ "Health: " + maxHealth*/;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            TakeDamage(1);
-        }
-    }
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
@@ -42,7 +37,7 @@ public class Player_Health : MonoBehaviour
     {
         currentHealth = 5;
         healtText.text = "HP: " + currentHealth;
-        player.transform.position = new Vector2(0, 0); // Resetuj pozycjê gracza
+        player.transform.position = startPos; // Resetuj pozycjê gracza
 
 
     }

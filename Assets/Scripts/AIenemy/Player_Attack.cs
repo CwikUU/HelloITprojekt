@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class Player_Attack : MonoBehaviour
 {
-    private Animator animator;
     [SerializeField] private float attackCooldown = 0.5f;
+
+    private Animator animator;
+    private Sword sword;
 
     // Start is called before the first frame update
     void Start()
     {
         animator = GetComponent<Animator>();
+        sword = GetComponentInChildren<Sword>();
     }
 
     // Update is called once per frame
@@ -32,6 +35,11 @@ public class Player_Attack : MonoBehaviour
     {
         animator.SetBool("isAttacking", false);
         attackCooldown = 0.5f; // Reset cooldown after attack
+    }
+
+    public void DrawSword()
+    {
+        sword.DrawSword(); // Call the DrawSword method from the Sword script
     }
 
 }
