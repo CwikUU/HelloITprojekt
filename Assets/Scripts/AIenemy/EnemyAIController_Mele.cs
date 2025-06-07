@@ -235,32 +235,41 @@ public class EnemyAIController_Mele : MonoBehaviour
         waypointIndex = 0; // Reset the waypoint index when chasing the player
         if (target != null)
         {
-            waypoints = pathfinding.FindPatch(transform.position, target.position);
+            float distanceToPlayer = Vector2.Distance(currentPosition, target.position);
 
-            if (Vector2.Distance(currentPosition, target.position) > stopDistance && inThis)
+            if (distanceToPlayer + 0.3f < stopDistance)
             {
-                if (waypoints != null && waypointIndex < waypoints.Length)
+                // Odsuwanie siê od gracza
+                //Vector2 directionAway = (currentPosition - (Vector2)target.position).normalized;
+                //float step = speed * Time.deltaTime;
+                //transform.position = (Vector2)transform.position + directionAway * step;
+            }
+            else
+            {
+                waypoints = pathfinding.FindPatch(transform.position, target.position);
+
+                if (distanceToPlayer > stopDistance && inThis)
                 {
-
-                    //Debug.Log("scigam");
-                    float step = speed * Time.deltaTime;
-
-                    transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-                    if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
+                    if (waypoints != null && waypointIndex < waypoints.Length)
                     {
-                        waypointIndex++;
-                        //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
+                        float step = speed * Time.deltaTime;
+                        transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
+                        if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
+                        {
+                            waypointIndex++;
+                        }
                     }
                 }
             }
-            if (Vector2.Distance(currentPosition,target.position) <= stopDistance && attackCDtimer  <=0)
+
+            if (distanceToPlayer <= stopDistance && attackCDtimer <= 0)
             {
                 //Debug.Log("Enemy is close enough to the player, switching to attacking state.");
-                
-                
+
+
                 state = State.Attacking; // If close enough to the player, switch to waiting state
                 enemyAttack.Attack();
-                
+
             }
         }
         else
@@ -327,8 +336,8 @@ public class EnemyAIController_Mele : MonoBehaviour
         if (arena)
         {
             return new Vector2(
-                Random.Range(0 - howFarX, 0 + howFarX),
-                Random.Range(0 - howFarY, 0 + howFarY)
+                Random.Range( - howFarX,  howFarX),
+                Random.Range( - howFarY,  howFarY)
             );
         }
         else
@@ -339,8 +348,6 @@ public class EnemyAIController_Mele : MonoBehaviour
             );
         }
     }
-
-   
 
     private void OnDrawGizmos()
     {

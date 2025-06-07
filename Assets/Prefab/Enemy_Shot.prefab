@@ -41,11 +41,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1482659901758649255}
   - component: {fileID: 5043127165894845993}
-  - component: {fileID: 2300814517088005581}
   - component: {fileID: 7726392361509194117}
   - component: {fileID: 8010088784960759203}
   - component: {fileID: 2356987258167543518}
   - component: {fileID: 4959163038213970310}
+  - component: {fileID: 3360827924613659251}
+  - component: {fileID: 7610662028208721670}
   m_Layer: 0
   m_Name: Enemy_Shot
   m_TagString: Enemy
@@ -121,18 +122,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2300814517088005581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5243959388964701728}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01ef148e557019641bceb1a140691409, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!95 &7726392361509194117
 Animator:
   serializedVersion: 5
@@ -230,6 +219,51 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &3360827924613659251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5243959388964701728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d439e7d913b3bce46b602f328eba22c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 3
+  waitTime: 1
+  draw: 0
+  howFarX: 19
+  howFarY: 17
+  stopDistance: 4
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  player: {fileID: 6701671933216888639, guid: 0c02531e63a46f443bed01e4b10f41e5, type: 3}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  state: 0
+  attackCD: 3
+  attackCDtimer: 0
+  targetpos: {x: 0, y: 0}
+  turret: {fileID: 6967522529431359402}
+--- !u!114 &7610662028208721670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5243959388964701728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed1da69aba9026949ae1ffb296d30b98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shotPoint: {fileID: 3700764565405730057}
+  projectilePrefab: {fileID: 7588832323829995925, guid: c0561795b2b58b24293d3d175610add1, type: 3}
+  projectileSpeed: 8
 --- !u!1 &5499604928351185985
 GameObject:
   m_ObjectHideFlags: 0

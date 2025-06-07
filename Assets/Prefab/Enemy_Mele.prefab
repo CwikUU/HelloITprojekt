@@ -217,11 +217,11 @@ MonoBehaviour:
   draw: 1
   howFarX: 19
   howFarY: 17
-  stopDistance: 1.5
+  stopDistance: 1.2
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
-  player: {fileID: 0}
+  player: {fileID: 6701671933216888639, guid: 0c02531e63a46f443bed01e4b10f41e5, type: 3}
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -229,6 +229,7 @@ MonoBehaviour:
   sword: {fileID: 445607153253102201}
   attackCD: 2
   attackCDtimer: 0
+  arena: 1
 --- !u!1 &3682057827776821993
 GameObject:
   m_ObjectHideFlags: 0

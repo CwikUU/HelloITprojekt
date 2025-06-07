@@ -32,7 +32,7 @@ public class GridMana : MonoBehaviour
         }
     }
 
-    private void CreateGrid()
+    public void CreateGrid()
     {
         grid = new Node[gridSizeX, gridSizeY]; // Inicjalizacja tablicy wêz³ów
         Vector3 bottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.up * gridWorldSize.y / 2; // Obliczenie lewego dolnego rogu siatki

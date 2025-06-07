@@ -22,6 +22,7 @@ public class EnemyAIController_Range : MonoBehaviour
     [SerializeField] private float howFarX, howFarY;// How far the enemy can roam from the start position
     [Range(0, 5)]
     [SerializeField] private float stopDistance;
+    [SerializeField] private float enemyPOV; // Enemy's point of view distance
     [SerializeField] private LayerMask wallLayer;
     private Enemy_AttackShot enemyShot;
     public GameObject player;
@@ -44,7 +45,8 @@ public class EnemyAIController_Range : MonoBehaviour
     private Coroutine waitingCoroutine;
     private float facingDirection = 1f;
     [HideInInspector]public Vector2 targetpos;
-    [SerializeField]private Transform turret;
+    [SerializeField] private Transform turret;
+    [SerializeField] private bool arena; // If true, roaming area is centered around (0,0), otherwise around startPosition
 
     private void Awake()
     {
@@ -130,13 +132,14 @@ public class EnemyAIController_Range : MonoBehaviour
 
     private void CheckForPlayer()
     {
-        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 5f, playerLayer);
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, enemyPOV, playerLayer);
         if (hitColliders.Length > 0)
         {
             Transform playerTransform = hitColliders[0].transform;
             RaycastHit2D hit = Physics2D.Linecast(transform.position, playerTransform.position, wallLayer);
             if (hit.collider == null)
             {
+                enemyPOV = 8f;
                 inThis = true;
                 target = playerTransform;
                 if (state != State.Chasing && state != State.Attacking) state = State.Chasing;
@@ -146,6 +149,7 @@ public class EnemyAIController_Range : MonoBehaviour
             }
             else
             {
+                enemyPOV = 5f;
                 if (target != null) lastPlayerPosition = new Vector2(target.position.x, target.position.y);
                 inThis = false;
                 target = null; // If there's a wall between the enemy and the player, set target to null
@@ -154,7 +158,8 @@ public class EnemyAIController_Range : MonoBehaviour
 
         if (hitColliders.Length == 0)
         {
-            if(target!=null) lastPlayerPosition = new Vector2(target.position.x, target.position.y);
+            enemyPOV = 5f;
+            if (target!=null) lastPlayerPosition = new Vector2(target.position.x, target.position.y);
             target = null;
             inThis = false;
             //Debug.Log("wyszedl");
@@ -226,42 +231,47 @@ public class EnemyAIController_Range : MonoBehaviour
 
     private void Chasing()
     {
-        
         if (waitingCoroutine != null)
         {
             StopCoroutine(waitingCoroutine);
             waitingCoroutine = null;
         }
-        //Debug.Log("sciga" + state);
-        waypointIndex = 0; // Reset the waypoint index when chasing the player
+        waypointIndex = 0;
+
         if (target != null)
         {
-            waypoints = pathfinding.FindPatch(transform.position, target.position);
+            float distanceToPlayer = Vector2.Distance(currentPosition, target.position);
 
-            if (Vector2.Distance(currentPosition, target.position) > stopDistance && inThis)
+            if (distanceToPlayer - .5f < stopDistance)
             {
-                if (waypoints != null && waypointIndex < waypoints.Length)
+                // Odsuwanie siê od gracza
+                Vector2 directionAway = (currentPosition - (Vector2)target.position).normalized;
+                float step = speed * Time.deltaTime;
+                transform.position = (Vector2)transform.position + directionAway * step;
+            }
+            else
+            {
+                // Standardowe pod¹¿anie za graczem
+                waypoints = pathfinding.FindPatch(transform.position, target.position);
+
+                if (distanceToPlayer > stopDistance && inThis)
                 {
-
-                    //Debug.Log("scigam");
-                    float step = speed * Time.deltaTime;
-
-                    transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-                    if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
+                    if (waypoints != null && waypointIndex < waypoints.Length)
                     {
-                        waypointIndex++;
-                        //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
+                        float step = speed * Time.deltaTime;
+                        transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
+                        if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
+                        {
+                            waypointIndex++;
+                        }
                     }
                 }
             }
-            if (Vector2.Distance(currentPosition,target.position) <= stopDistance && attackCDtimer  <=0)
+
+            if (attackCDtimer <= 0)
             {
-                //Debug.Log("Enemy is close enough to the player, switching to attacking state.");
-                
                 targetpos = target.position;
-                //state = State.Attacking; // If close enough to the player, switch to waiting state
                 enemyShot.StartShot();
-                
             }
         }
         else
@@ -273,33 +283,23 @@ public class EnemyAIController_Range : MonoBehaviour
         {
             if (waypoints != null && waypointIndex < waypoints.Length)
             {
-
-
-                //Debug.Log("znikl");
                 float step = speed * Time.deltaTime;
                 transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
 
                 if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
                 {
                     waypointIndex++;
-                    //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
                 }
             }
 
-                if (waypoints != null && waypointIndex >= waypoints.Length)
-                {
-                    
-                    roamPosition = Vector2.zero; // Reset roam position when returning
-                    //state = State.Returning; // wraca do miejsca startowego trza zrobic
-                    waypoints = null; // Clear waypoints when returning
-                    waypointIndex = 0; // Reset the waypoint index when returning
-                    state = State.Roaming; // Idzie do innego miejsca w patrolu
-                    //Debug.Log("Enemy has stopped chasing the player." + state);
-                }
-            
+            if (waypoints != null && waypointIndex >= waypoints.Length)
+            {
+                roamPosition = Vector2.zero;
+                waypoints = null;
+                waypointIndex = 0;
+                state = State.Roaming;
+            }
         }
-        
-        
     }
 
     private void Returning()
@@ -322,24 +322,42 @@ public class EnemyAIController_Range : MonoBehaviour
 
     }
 
-    
+
     public Vector2 GetRoamingPosition()
     {
-        return new Vector2(
-            Random.Range(startPosition.x-howFarX, startPosition.x + howFarX),
-            Random.Range(startPosition.y - howFarY, startPosition.y + howFarY)
-        );
-
+        if (arena)
+        {
+            return new Vector2(
+                Random.Range(-howFarX, howFarX),
+                Random.Range(-howFarY, howFarY)
+            );
+        }
+        else
+        {
+            return new Vector2(
+                Random.Range(startPosition.x - howFarX, startPosition.x + howFarX),
+                Random.Range(startPosition.y - howFarY, startPosition.y + howFarY)
+            );
+        }
     }
-
-   
 
     private void OnDrawGizmos()
     {
         if (draw)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(startPosition, new Vector2(howFarX * 2, howFarY * 2)); // Draw a wireframe cube around the roaming area
+            if (arena)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireCube(new Vector2(0, 0), new Vector2(howFarX * 2, howFarY * 2)); // Draw a wireframe cube around the roaming area
+            }
+            else
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireCube(startPosition, new Vector2(howFarX * 2, howFarY * 2)); // Draw a wireframe cube around the roaming area
+            }
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, enemyPOV); // Draw a sphere around the enemy to visualize the point of view
         }
     }
 }
