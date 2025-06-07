@@ -10,6 +10,7 @@ public class Enemy_AttackMele : MonoBehaviour
     private Sword sword;
     private Collider2D swordCollider;
     private EnemyAIController_Mele melController;
+    private Rigidbody2D rb;
 
     void Start()
     {
@@ -17,6 +18,7 @@ public class Enemy_AttackMele : MonoBehaviour
         animator = GetComponent<Animator>();
         sword = GetComponentInChildren<Sword>();
         swordCollider = sword.GetComponent<Collider2D>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
@@ -51,5 +53,12 @@ public class Enemy_AttackMele : MonoBehaviour
         {
             swordCollider.enabled = true; // Enable the sword collider
         }
+    }
+
+    public void AttackStep()
+    {
+        //Vector2 direction = (melController.targetpos - (Vector2)melController.transform.position).normalized;
+        //rb.velocity = direction * 1; // Move towards the target during the attack
+        //Debug.Log(melController.state);
     }
 }

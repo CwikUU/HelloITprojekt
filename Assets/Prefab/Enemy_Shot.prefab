@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3700764565405730057}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: shotPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 4959163038213970310}
   - component: {fileID: 3360827924613659251}
   - component: {fileID: 7610662028208721670}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Enemy_Shot
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -237,6 +237,7 @@ MonoBehaviour:
   howFarX: 19
   howFarY: 17
   stopDistance: 4
+  enemyPOV: 0
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -249,6 +250,7 @@ MonoBehaviour:
   attackCDtimer: 0
   targetpos: {x: 0, y: 0}
   turret: {fileID: 6967522529431359402}
+  arena: 0
 --- !u!114 &7610662028208721670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +276,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6967522529431359402}
   - component: {fileID: 7777481902096592269}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -360,7 +362,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4371005197152036239}
   - component: {fileID: 1970479905633196812}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: shot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

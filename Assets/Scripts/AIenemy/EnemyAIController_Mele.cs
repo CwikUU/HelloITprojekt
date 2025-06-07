@@ -15,7 +15,7 @@ public class EnemyAIController_Mele : MonoBehaviour
         Attacking,
     }
     [Range(0, 10)]
-    [SerializeField] private float speed; // Speed of the enemy
+    [SerializeField] public float speed; // Speed of the enemy
     [Range(0, 10)]
     [SerializeField] private int waitTime; // Time to wait at each roaming position
     [SerializeField] private bool draw; // Whether to draw the roaming area in the editor
@@ -45,6 +45,7 @@ public class EnemyAIController_Mele : MonoBehaviour
     private Coroutine waitingCoroutine;
     private float facingDirection = 1f;
     [SerializeField] private bool arena;
+    [HideInInspector] public Vector2 targetpos;
 
     private void Awake()
     {
@@ -266,7 +267,7 @@ public class EnemyAIController_Mele : MonoBehaviour
             {
                 //Debug.Log("Enemy is close enough to the player, switching to attacking state.");
 
-
+                targetpos = target.position;
                 state = State.Attacking; // If close enough to the player, switch to waiting state
                 enemyAttack.Attack();
 

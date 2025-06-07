@@ -51252,6 +51252,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4065323830754792465, guid: 0c02531e63a46f443bed01e4b10f41e5, type: 3}
+      propertyPath: rollCD
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4065323830754792465, guid: 0c02531e63a46f443bed01e4b10f41e5, type: 3}
       propertyPath: rollActive
       value: 
       objectReference: {fileID: 254852608}

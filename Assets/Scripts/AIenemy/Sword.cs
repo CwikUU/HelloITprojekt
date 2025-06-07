@@ -35,7 +35,7 @@ public class Sword : MonoBehaviour
                 Player_Health playerHealth = collision.GetComponent<Player_Health>();
                 if (playerHealth != null)
                 {
-                    playerHealth.TakeDamage(1);
+                    //playerHealth.TakeDamage(1);
                 }
             }
         }
