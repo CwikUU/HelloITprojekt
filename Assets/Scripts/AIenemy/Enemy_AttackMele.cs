@@ -45,9 +45,10 @@ public class Enemy_AttackMele : MonoBehaviour
     {
         if (swordCollider.enabled == true)
         {
+            melController.agent.isStopped = false; // Stop the agent from moving
+            melController.isAsttack = false;
             swordCollider.enabled = false; // Disable the sword collider
             animator.SetBool("isAttacking", false);
-            melController.state = EnemyAIController_Mele.State.Chasing;
         }
         else
         {
@@ -57,8 +58,16 @@ public class Enemy_AttackMele : MonoBehaviour
 
     public void AttackStep()
     {
-        //Vector2 direction = (melController.targetpos - (Vector2)melController.transform.position).normalized;
-        //rb.velocity = direction * 1; // Move towards the target during the attack
-        //Debug.Log(melController.state);
+        Vector2 direction = (melController.targetpos - (Vector2)melController.transform.position).normalized;
+        rb.velocity = direction * melController.speed;
+    }
+
+    public void EndAttack()
+    {
+        melController.agent.isStopped = false;
+        melController.isAsttack = false;
+        melController.state = EnemyAIController_Mele.State.Chasing;
+        animator.SetBool("isAttacking", false);
+        StartCoroutine(melController.Chasing());
     }
 }
