@@ -53,6 +53,7 @@ public class EnemyAIController_Mele : MonoBehaviour
     Rigidbody2D rb;
     public Transform body;
     private float tranZ; // Variable to store the current rotation around the Z-axis
+    private bool work;
 
 
     private void Awake()
@@ -109,6 +110,7 @@ public class EnemyAIController_Mele : MonoBehaviour
         {
             transform.rotation = Quaternion.Euler(new Vector3(0, 0, tranZ));
         }
+        //Debug.Log("Current State: " + state + ", Target: " + target + ", In This: " + inThis + ", Chasing: " + chasing);
     }
 
     private void CheckForPlayer()
@@ -232,7 +234,7 @@ public class EnemyAIController_Mele : MonoBehaviour
 
         while (true)
         {
-
+            //Debug.Log("widzi"+work);
             if (target != null)
             {
 
@@ -265,6 +267,7 @@ public class EnemyAIController_Mele : MonoBehaviour
 
             if (!inThis)
             {
+                //Debug.Log("niewidzi" + work);
                 agent.isStopped = false;
                 agent.stoppingDistance = 0f;
                 agent.SetDestination(lastPlayerPosition); // Set the destination to the last known player position

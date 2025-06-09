@@ -5,6 +5,7 @@ using UnityEngine;
 public class Player_Attack : MonoBehaviour
 {
     [SerializeField] private float attackCooldown = 0.5f;
+    private float attackCooldownTimer = 0f;
 
     private Animator animator;
     private Sword sword;
@@ -14,14 +15,15 @@ public class Player_Attack : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         sword = GetComponentInChildren<Sword>();
+        attackCooldownTimer = attackCooldown; // Initialize cooldown timer
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (attackCooldown > 0)
+        if (attackCooldownTimer > 0)
         {
-            attackCooldown -= Time.deltaTime;
+            attackCooldownTimer -= Time.deltaTime;
         }
 
         if (Input.GetMouseButtonDown(0)&& attackCooldown<=0 )//
@@ -34,7 +36,7 @@ public class Player_Attack : MonoBehaviour
     public void Attack()
     {
         animator.SetBool("isAttacking", false);
-        attackCooldown = 0.5f; // Reset cooldown after attack
+        attackCooldownTimer = attackCooldown; // Reset cooldown after attack
     }
 
     public void DrawSword()

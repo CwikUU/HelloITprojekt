@@ -260,11 +260,13 @@ MonoBehaviour:
     m_Bits: 128
   state: 0
   sword: {fileID: 445607153253102201}
-  attackCD: 1
+  attackCD: 2
   attackCDtimer: 0
   arena: 1
   targetpos: {x: 0, y: 0}
+  agent: {fileID: 0}
   chasing: 0
+  isAsttack: 0
   body: {fileID: 5294145676351813666}
 --- !u!195 &1952559380545606956
 NavMeshAgent:

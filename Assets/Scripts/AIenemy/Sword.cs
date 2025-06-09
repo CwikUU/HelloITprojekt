@@ -37,9 +37,9 @@ public class Sword : MonoBehaviour
                 {
                     playerHealth.TakeDamage(1);
                 }
+                sword.enabled = false; // Disable the sword collider after hitting the player
             }
         }
-        //Debug.Log("Enemy hit!");
     }
 
     public void DrawSword()
