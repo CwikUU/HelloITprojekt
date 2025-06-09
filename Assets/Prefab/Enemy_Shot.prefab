@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 4959163038213970310}
   - component: {fileID: 3360827924613659251}
   - component: {fileID: 7610662028208721670}
+  - component: {fileID: 4557435668080154225}
   m_Layer: 8
   m_Name: Enemy_Shot
   m_TagString: Enemy
@@ -112,7 +113,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 0.39305976, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.39305976, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -172,7 +173,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -237,7 +238,7 @@ MonoBehaviour:
   howFarX: 19
   howFarY: 17
   stopDistance: 4
-  enemyPOV: 0
+  enemyPOV: 5
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -249,8 +250,11 @@ MonoBehaviour:
   attackCD: 3
   attackCDtimer: 0
   targetpos: {x: 0, y: 0}
+  agent: {fileID: 0}
   turret: {fileID: 6967522529431359402}
-  arena: 0
+  arena: 1
+  chasing: 0
+  isAttack: 0
 --- !u!114 &7610662028208721670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,6 +270,28 @@ MonoBehaviour:
   shotPoint: {fileID: 3700764565405730057}
   projectilePrefab: {fileID: 7588832323829995925, guid: c0561795b2b58b24293d3d175610add1, type: 3}
   projectileSpeed: 8
+--- !u!195 &4557435668080154225
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5243959388964701728}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3
+  m_Acceleration: 69.3
+  avoidancePriority: 50
+  m_AngularSpeed: 91.3
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0.5
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &5499604928351185985
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,7 +319,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4371005197152036239}
@@ -342,7 +368,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
+  m_Color: {r: 0.6312507, g: 0.9716981, b: 0.43543077, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

@@ -36,18 +36,14 @@ public class EnemyAIController_Range : MonoBehaviour
     private Vector2 lastPlayerPosition;
     private Transform target;
     private bool inThis = false;
-    private float waitingTime = 0f;
-    private Pathfinding pathfinding;
-    private Vector2[] waypoints;
-    private int waypointIndex = 0;
     private Animator anim;
-    private NavMeshAgent agent;
     float lastX;
     [SerializeField] public float attackCD;
     [HideInInspector] public float attackCDtimer;
     private Coroutine waitingCoroutine;
     private float facingDirection = 1f;
-    [HideInInspector]public Vector2 targetpos;
+    [HideInInspector] public Vector2 targetpos;
+    [HideInInspector] public NavMeshAgent agent;
     [SerializeField] private Transform turret;
     [SerializeField] private bool arena; // If true, roaming area is centered around (0,0), otherwise around startPosition
     private Rigidbody2D rb;
@@ -61,7 +57,6 @@ public class EnemyAIController_Range : MonoBehaviour
         lastPlayerPosition = transform.position;
         state = State.Roaming;
         startPosition = transform.position;
-        pathfinding = FindObjectOfType<Pathfinding>();
         player = GameObject.FindGameObjectWithTag("Player");
         anim = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
@@ -73,6 +68,7 @@ public class EnemyAIController_Range : MonoBehaviour
     {
         StartCoroutine(Roaming()); // Start the roaming coroutine when the enemy AI starts
         agent.updateRotation = false; // Disable automatic rotation of the NavMeshAgent
+        agent.speed = speed; // Set the speed of the NavMeshAgent
     }
 
     private void Update()
@@ -100,28 +96,6 @@ public class EnemyAIController_Range : MonoBehaviour
         }
     }
 
-    //public void EnemyRoutine()
-    //{
-    //    switch (state)
-    //    {   
-    //        case State.Roaming:
-    //            Roaming();
-
-    //            break;
-    //        case State.Waiting:
-    //            break;
-    //        case State.Returning:
-    //            Returning();
-    //            break;
-    //        case State.Chasing:
-    //            StopCoroutine(Waiting()); // Stop waiting coroutine if chasing
-    //            Chasing();
-    //            break;
-    //        case State.Attacking:
-    //            break;
-    //    }   
-    //}
-
     private void CheckForPlayer()
     {
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, enemyPOV, playerLayer);
@@ -140,9 +114,7 @@ public class EnemyAIController_Range : MonoBehaviour
                 }
                 target = playerTransform;
                 if (state != State.Chasing && state != State.Attacking) state = State.Chasing;
-
-                waypointIndex = 0; // Reset the waypoint index when entering the trigger
-                                   //Debug.Log("wszedl ");
+                     
             }
             else
             {
@@ -169,7 +141,6 @@ public class EnemyAIController_Range : MonoBehaviour
     {
         StopCoroutine(Roaming());
         yield return new WaitForSeconds(waitTime); // Czekaj okreœlony czas
-        waitingTime = 0f;
         state = State.Roaming;
         roamPosition = Vector2.zero;
         waitingCoroutine = null;
@@ -209,7 +180,6 @@ public class EnemyAIController_Range : MonoBehaviour
             }
             yield return null; // Wait for the next frame
         }
-
     }
 
     public IEnumerator Chasing()
@@ -222,7 +192,6 @@ public class EnemyAIController_Range : MonoBehaviour
 
         while (true)
         {
-            //Debug.Log("widzi"+work);
             if (target != null)
             {
 
@@ -254,7 +223,6 @@ public class EnemyAIController_Range : MonoBehaviour
 
         if (!inThis)
         {
-                //Debug.Log("niewidzi" + work);
                 agent.isStopped = false;
                 agent.stoppingDistance = 0f;
                 agent.SetDestination(lastPlayerPosition); // Set the destination to the last known player position
@@ -263,9 +231,7 @@ public class EnemyAIController_Range : MonoBehaviour
                 {
 
                     roamPosition = Vector2.zero; // Reset roam position when returning
-                                                 //state = State.Returning; // wraca do miejsca startowego trza zrobic
-                    waypoints = null; // Clear waypoints when returning
-                    waypointIndex = 0; // Reset the waypoint index when returning
+                                               
                     state = State.Roaming; // Idzie do innego miejsca w patrolu
                     StartCoroutine(Roaming()); // Start roaming again after returning
                     chasing = false; // Reset chasing flag when returning to last known position
@@ -278,9 +244,6 @@ public class EnemyAIController_Range : MonoBehaviour
 
     private void Returning()
     {
-        //Debug.Log("Distance to start position: " + Vector2.Distance(transform.position, startPosition));
-        //Debug.Log("Speed: " + speed + state);
-
         if (Vector2.Distance(transform.position, roamPosition) > 0.1f)
         {
             Debug.Log("Moving towards start position");
@@ -295,7 +258,6 @@ public class EnemyAIController_Range : MonoBehaviour
         }
 
     }
-
 
     public Vector2 GetRoamingPosition()
     {

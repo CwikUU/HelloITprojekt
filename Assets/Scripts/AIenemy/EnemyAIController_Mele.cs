@@ -35,10 +35,6 @@ public class EnemyAIController_Mele : MonoBehaviour
     private Vector2 lastPlayerPosition;
     private Transform target;
     private bool inThis = false;
-    private float waitingTime = 0f;
-    private Pathfinding pathfinding;
-    private Vector2[] waypoints;
-    private int waypointIndex = 0;
     private Animator anim;
     float lastX;
     [SerializeField] private Transform sword;
@@ -62,7 +58,6 @@ public class EnemyAIController_Mele : MonoBehaviour
         lastPlayerPosition = transform.position;
         state = State.Roaming;
         startPosition = transform.position;
-        pathfinding = FindObjectOfType<Pathfinding>();
         player = GameObject.FindGameObjectWithTag("Player");
         anim = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
@@ -73,6 +68,7 @@ public class EnemyAIController_Mele : MonoBehaviour
     {
         StartCoroutine(Roaming()); // Start the roaming coroutine when the enemy AI starts
         agent.updateRotation = false; // Disable automatic rotation of the NavMeshAgent
+        agent.speed = speed; // Set the speed of the NavMeshAgent
     }
 
     private void Update()
@@ -153,7 +149,6 @@ public class EnemyAIController_Mele : MonoBehaviour
     {
         StopCoroutine(Roaming()); // Stop roaming coroutine if waiting
         yield return new WaitForSeconds(waitTime); // Czekaj okreœlony czas
-        waitingTime = 0f;
         state = State.Roaming;
         roamPosition = Vector2.zero;
         waitingCoroutine = null;
@@ -192,7 +187,6 @@ public class EnemyAIController_Mele : MonoBehaviour
             }
             yield return null; // Wait for the next frame
         }
-
     }
 
     public IEnumerator Chasing()
@@ -205,7 +199,6 @@ public class EnemyAIController_Mele : MonoBehaviour
 
         while (true)
         {
-            //Debug.Log("widzi"+work);
             if (target != null)
             {
 
@@ -226,7 +219,6 @@ public class EnemyAIController_Mele : MonoBehaviour
                 if (distanceToPlayer <= stopDistance && attackCDtimer <= 0)
                 {
                     agent.isStopped = true; // Zatrzymaj ruch agenta
-                    rb.velocity = Vector2.zero; // Dla pewnoœci zatrzymaj Rigidbody2D
                     isAsttack = true; // Set attack flag when close enough to the player
                     targetpos = target.position;
                     state = State.Attacking; // If close enough to the player, switch to waiting state
@@ -238,7 +230,6 @@ public class EnemyAIController_Mele : MonoBehaviour
 
             if (!inThis)
             {
-                //Debug.Log("niewidzi" + work);
                 agent.isStopped = false;
                 agent.stoppingDistance = 0f;
                 agent.SetDestination(lastPlayerPosition); // Set the destination to the last known player position
@@ -247,9 +238,7 @@ public class EnemyAIController_Mele : MonoBehaviour
                 {
                     
                     roamPosition = Vector2.zero; // Reset roam position when returning
-                                                 //state = State.Returning; // wraca do miejsca startowego trza zrobic
-                    waypoints = null; // Clear waypoints when returning
-                    waypointIndex = 0; // Reset the waypoint index when returning
+                                                
                     state = State.Roaming; // Idzie do innego miejsca w patrolu
                     StartCoroutine(Roaming()); // Start roaming again after returning
                     chasing = false; // Reset chasing flag when returning to last known position
@@ -262,9 +251,6 @@ public class EnemyAIController_Mele : MonoBehaviour
 
     private void Returning()
     {
-        //Debug.Log("Distance to start position: " + Vector2.Distance(transform.position, startPosition));
-        //Debug.Log("Speed: " + speed + state);
-
         if (Vector2.Distance(transform.position, roamPosition) > 0.1f)
         {
             Debug.Log("Moving towards start position");
@@ -280,7 +266,6 @@ public class EnemyAIController_Mele : MonoBehaviour
 
     }
 
-    
     public Vector2 GetRoamingPosition()
     {
         if (arena)
