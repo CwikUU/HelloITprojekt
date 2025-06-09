@@ -10,9 +10,10 @@ public class Player_Movement : MonoBehaviour
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Animator animator;
     [SerializeField] private float rollCD = 3; // Cooldown for rolling
-    [SerializeField] private Image rollActive; 
+    [SerializeField] private Image rollActive;
+    [HideInInspector] public float stuneTimer; // To check if the player is rolling
 
-private float rollCd = 0f;
+    private float rollCd = 0f;
 
 
     private void Start()
@@ -23,6 +24,10 @@ private float rollCd = 0f;
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (stuneTimer > 0)
+        {
+            stuneTimer -= Time.fixedDeltaTime;
+        }
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
@@ -37,27 +42,30 @@ private float rollCd = 0f;
         animator.SetFloat("horizontal", Mathf.Abs(horizontal));
         animator.SetFloat("vertical", Mathf.Abs(vertical));
 
-        rb.velocity = new Vector2(horizontal, vertical) * speed;
+        if (stuneTimer <= 0)
+        {
+            rb.velocity = new Vector2(horizontal, vertical) * speed;
 
-        if (rollCd > 0)
-        {
-            rollCd -= Time.fixedDeltaTime;
-        }
-        else
-        {
-            rollActive.color = Color.green; // Reset color when cooldown is over
-        }
-        if (Input.GetKey(KeyCode.Space) && rollCd <= 0f)
-        {
-            rollActive.color = Color.red;
-            StartCoroutine(Roll());
-            rollCd = rollCD;
-        }
+            if (rollCd > 0)
+            {
+                rollCd -= Time.fixedDeltaTime;
+            }
+            else
+            {
+                rollActive.color = Color.green; // Reset color when cooldown is over
+            }
+            if (Input.GetKey(KeyCode.Space) && rollCd <= 0f)
+            {
+                rollActive.color = Color.red;
+                StartCoroutine(Roll());
+                rollCd = rollCD;
+            }
 
-        Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = (mouseWorldPosition - rb.position).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        rb.rotation = angle;
+            Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 direction = (mouseWorldPosition - rb.position).normalized;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            rb.rotation = angle;
+        }
     }
 
     private IEnumerator Roll()

@@ -23,7 +23,7 @@ public class EnemyAIController_Mele : MonoBehaviour
     [SerializeField] private bool draw; // Whether to draw the roaming area in the editor
     [SerializeField] private float howFarX, howFarY;// How far the enemy can roam from the start position
     [Range(0, 5)]
-    [SerializeField] private float stopDistance;
+    [SerializeField] public float stopDistance;
     [SerializeField] private LayerMask wallLayer;
     private Enemy_AttackMele enemyAttack;
     public GameObject player;
@@ -50,6 +50,7 @@ public class EnemyAIController_Mele : MonoBehaviour
     public Transform body;
     private float tranZ; // Variable to store the current rotation around the Z-axis
     private bool work;
+    public float distanceToPlayer; // Variable to store the distance to the player
 
 
     private void Awake()
@@ -202,7 +203,7 @@ public class EnemyAIController_Mele : MonoBehaviour
             if (target != null)
             {
 
-                float distanceToPlayer = Vector2.Distance(currentPosition, target.position);
+                distanceToPlayer = Vector2.Distance(currentPosition, target.position);
 
                 if (distanceToPlayer > stopDistance)
                 {
@@ -214,17 +215,9 @@ public class EnemyAIController_Mele : MonoBehaviour
                     agent.isStopped = true; // Zatrzymaj ruch agenta
                     rb.velocity = Vector2.zero; // Dla pewnoœci zatrzymaj Rigidbody2D
                 }
-
-
-                if (distanceToPlayer <= stopDistance && attackCDtimer <= 0)
-                {
-                    agent.isStopped = true; // Zatrzymaj ruch agenta
-                    isAsttack = true; // Set attack flag when close enough to the player
-                    targetpos = target.position;
-                    state = State.Attacking; // If close enough to the player, switch to waiting state
-                    enemyAttack.Attack();
-                    yield break;
-                }
+                targetpos = target.position;
+                enemyAttack.Attack();
+                 
             }
 
 

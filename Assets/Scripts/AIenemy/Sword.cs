@@ -5,8 +5,10 @@ using UnityEngine;
 public class Sword : MonoBehaviour
 {
     [SerializeField] private bool Player;
+    [HideInInspector] public bool isGiant;
     private float timer = 0f;
     private Collider2D sword;
+    [HideInInspector]public bool Stune = false;
 
     private void Start()
     {
@@ -33,13 +35,31 @@ public class Sword : MonoBehaviour
         }
         else
         {
-            Debug.Log(timer);
             if (collision.CompareTag("Player"))
             {
                 Player_Health playerHealth = collision.GetComponent<Player_Health>();
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(1);
+                }
+                sword.enabled = false; // Disable the sword collider after hitting the player
+            }
+        }
+
+        if (isGiant)
+        {
+
+            if (collision.CompareTag("Player"))
+            {
+                
+                if (Stune)
+                {
+
+                }
+                Player_Health playerHealth = collision.GetComponent<Player_Health>();
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(2); // Deal more damage for giant sword
                 }
                 sword.enabled = false; // Disable the sword collider after hitting the player
             }

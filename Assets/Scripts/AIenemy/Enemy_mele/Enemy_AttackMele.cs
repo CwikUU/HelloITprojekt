@@ -4,7 +4,17 @@ using UnityEngine;
 
 public class Enemy_AttackMele : MonoBehaviour
 {
-    private float attackCooldown;
+    [SerializeField] private bool mele = false;
+    [SerializeField] private float attackCooldown;
+    [SerializeField] private bool giant = false;
+    [SerializeField] private float throwCooldown;
+    [SerializeField] private float throwDistance;
+    [SerializeField] public float stunTime;
+    [HideInInspector] private bool canStunned = false;
+
+    private float attackTimer = 0f;
+    private float throwTimer = 0f;
+    private Vector2 targetPosition;
 
     private Animator animator;
     private Sword sword;
@@ -19,26 +29,39 @@ public class Enemy_AttackMele : MonoBehaviour
         sword = GetComponentInChildren<Sword>();
         swordCollider = sword.GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
+        sword.isGiant = giant;
     }
 
     void Update()
     {
-        if (attackCooldown > 0)
+        if (attackTimer > 0)
         {
-            attackCooldown -= Time.deltaTime;
+            attackTimer -= Time.deltaTime;
         }
-        else
+
+        if (throwTimer > 0)
         {
-            melController.attackCDtimer = attackCooldown; // Update the attack cooldown timer in Proba
+            throwTimer -= Time.deltaTime;
         }
 
     }
 
     public void Attack()
     {
-        animator.SetBool("isAttacking", true);
-        attackCooldown = melController.attackCD;
-        melController.attackCDtimer = attackCooldown;
+        if (mele && attackTimer <= 0 && melController.distanceToPlayer <= melController.stopDistance)
+        {
+            melController.agent.isStopped = true;
+            melController.isAsttack = true;
+            targetPosition = melController.targetpos;
+            animator.SetBool("isAttacking", true);
+            attackTimer = attackCooldown;
+        }
+
+        if (giant && throwTimer <= 0 && melController.distanceToPlayer <= throwDistance)
+        {
+            animator.SetBool("isThrowing", true);
+            throwTimer = throwCooldown;
+        }
     }
 
     public void DrawSword()
@@ -67,6 +90,12 @@ public class Enemy_AttackMele : MonoBehaviour
         melController.state = EnemyAIController_Mele.State.Chasing;
         animator.SetBool("isAttacking", false);
         StartCoroutine(melController.Chasing());
-        
+    }
+
+
+    public void Stun()
+    {
+        canStunned = !canStunned;
+        sword.Stune = canStunned;
     }
 }
