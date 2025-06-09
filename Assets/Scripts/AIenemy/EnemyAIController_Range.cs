@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UIElements.Experimental;
 
 public class EnemyAIController_Range : MonoBehaviour
 {
@@ -39,6 +41,7 @@ public class EnemyAIController_Range : MonoBehaviour
     private Vector2[] waypoints;
     private int waypointIndex = 0;
     private Animator anim;
+    private NavMeshAgent agent;
     float lastX;
     [SerializeField] public float attackCD;
     [HideInInspector] public float attackCDtimer;
@@ -47,6 +50,10 @@ public class EnemyAIController_Range : MonoBehaviour
     [HideInInspector]public Vector2 targetpos;
     [SerializeField] private Transform turret;
     [SerializeField] private bool arena; // If true, roaming area is centered around (0,0), otherwise around startPosition
+    private Rigidbody2D rb;
+    [HideInInspector] public bool chasing = false;
+    [HideInInspector] public bool isAttack = false;// Flag to check if the enemy is currently chasing the player
+
 
     private void Awake()
     {
@@ -57,36 +64,21 @@ public class EnemyAIController_Range : MonoBehaviour
         pathfinding = FindObjectOfType<Pathfinding>();
         player = GameObject.FindGameObjectWithTag("Player");
         anim = GetComponent<Animator>();
+        agent = GetComponent<NavMeshAgent>();
+        rb = GetComponent<Rigidbody2D>();
+
     }
 
     private void Start()
     {
-        
-        //Debug.Log("Enemy AI started at position: " + startPosition);
+        StartCoroutine(Roaming()); // Start the roaming coroutine when the enemy AI starts
+        agent.updateRotation = false; // Disable automatic rotation of the NavMeshAgent
     }
 
     private void Update()
     {
         currentPosition = transform.position;
-        //Debug.Log(state+"stastsatasdtdastasdtadstdasg");
-        //Debug.Log("target position: " + currentPosition + roamPosition+inThis+state+ Vector2.Distance(currentPosition, roamPosition));
-        EnemyRoutine();
         CheckForPlayer(); // Check for player in the trigger area
-
-        float curX = transform.position.x;
-        float delta = curX - lastX;
-        if (Mathf.Abs(delta) > .01f)
-        {
-            if ((delta > 0 && facingDirection == 1) || (delta < 0 && facingDirection == -1))
-            {
-                facingDirection *= -1; // Flip the facing direction
-                Vector3 scale = transform.localScale;
-                scale.x *= -1;
-                transform.localScale = scale;
-                turret.localScale = scale;
-            }
-        }
-        lastX = curX;
 
         if (target != null)
         {
@@ -108,27 +100,27 @@ public class EnemyAIController_Range : MonoBehaviour
         }
     }
 
-    public void EnemyRoutine()
-    {
-        switch (state)
-        {   
-            case State.Roaming:
-                Roaming();
+    //public void EnemyRoutine()
+    //{
+    //    switch (state)
+    //    {   
+    //        case State.Roaming:
+    //            Roaming();
 
-                break;
-            case State.Waiting:
-                break;
-            case State.Returning:
-                Returning();
-                break;
-            case State.Chasing:
-                StopCoroutine(Waiting()); // Stop waiting coroutine if chasing
-                Chasing();
-                break;
-            case State.Attacking:
-                break;
-        }   
-    }
+    //            break;
+    //        case State.Waiting:
+    //            break;
+    //        case State.Returning:
+    //            Returning();
+    //            break;
+    //        case State.Chasing:
+    //            StopCoroutine(Waiting()); // Stop waiting coroutine if chasing
+    //            Chasing();
+    //            break;
+    //        case State.Attacking:
+    //            break;
+    //    }   
+    //}
 
     private void CheckForPlayer()
     {
@@ -141,6 +133,11 @@ public class EnemyAIController_Range : MonoBehaviour
             {
                 enemyPOV = 8f;
                 inThis = true;
+                if (!chasing)
+                {
+                    chasing = true;
+                    StartCoroutine(Chasing());
+                }
                 target = playerTransform;
                 if (state != State.Chasing && state != State.Attacking) state = State.Chasing;
 
@@ -170,135 +167,112 @@ public class EnemyAIController_Range : MonoBehaviour
 
     private IEnumerator Waiting()
     {
-        //Debug.Log("Waiting state: " );
+        StopCoroutine(Roaming());
         yield return new WaitForSeconds(waitTime); // Czekaj okreœlony czas
         waitingTime = 0f;
         state = State.Roaming;
         roamPosition = Vector2.zero;
         waitingCoroutine = null;
-        //Debug.Log("Enemy has finished waiting and is now roaming again." + state);
+        StartCoroutine(Roaming());
     }
 
-    private void Roaming()
+    private IEnumerator Roaming()
     {
-        state = State.Roaming;
-        //Debug.Log("Roaming state: ");
-        if (waitingCoroutine != null)
-        {
-            StopCoroutine(waitingCoroutine);
-            waitingCoroutine = null;
-        }
-
-        if (roamPosition == Vector2.zero)
+        agent.stoppingDistance = 0f; // Reset the stopping distance for the NavMeshAgent
+        bool canRoam = false; // Flag to check if a valid roaming position is found
+        while (!canRoam)
         {
             roamPosition = GetRoamingPosition();
-            waypoints = pathfinding.FindPatch(transform.position, roamPosition); // Get waypoints to the new roaming position
-            waypointIndex = 0; // Reset the waypoint index when getting a new roaming position
+            Collider2D hit = Physics2D.OverlapCircle(roamPosition, 1.5f, wallLayer); // Check if the roaming position is valid
+            canRoam = (hit == null); // If no wall is hit, the position is valid
         }
 
-        
-            if (waypoints != null && waypointIndex < waypoints.Length)
-            {
-
-                float step = speed * Time.deltaTime;
-                transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-                //Debug.Log("Enemy is roaming towards waypoint: " + waypointIndex + " at position: " + waypoints[waypointIndex]);
-            if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
-                {
-                    waypointIndex++;
-                    //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
-                }
-
-                if (Vector2.Distance(currentPosition, roamPosition) < 0.1f)
-                {
-                   
-
-                }
-            }
-
-        if (waypoints != null && waypointIndex >= waypoints.Length)
-        {
-            //Debug.Log("Enemy has reached the roaming position.");
-            state = State.Waiting;
-            if (waitingCoroutine == null)
-                waitingCoroutine = StartCoroutine(Waiting());
-            waypoints = null;
-            roamPosition = Vector2.zero; // Reset roam position when reaching the roaming position
-        }
-
-
-    }
-
-    private void Chasing()
-    {
         if (waitingCoroutine != null)
         {
             StopCoroutine(waitingCoroutine);
             waitingCoroutine = null;
         }
-        waypointIndex = 0;
 
-        if (target != null)
+        Debug.Log(Vector2.Distance(transform.position, roamPosition));
+
+        agent.SetDestination(roamPosition); // Set the destination to the roaming position
+
+        while (true)
         {
-            float distanceToPlayer = Vector2.Distance(currentPosition, target.position);
-
-            if (distanceToPlayer - .5f < stopDistance)
+            if (Vector2.Distance(transform.position, roamPosition) < .1f)
             {
-                // Odsuwanie siê od gracza
-                Vector2 directionAway = (currentPosition - (Vector2)target.position).normalized;
-                float step = speed * Time.deltaTime;
-                transform.position = (Vector2)transform.position + directionAway * step;
+                state = State.Waiting;
+                if (waitingCoroutine == null)
+                    waitingCoroutine = StartCoroutine(Waiting());
+                roamPosition = Vector2.zero; // Reset roam position after reaching it
+                yield break; // Exit the coroutine when the roaming position is reached
             }
-            else
-            {
-                // Standardowe pod¹¿anie za graczem
-                waypoints = pathfinding.FindPatch(transform.position, target.position);
-
-                if (distanceToPlayer > stopDistance && inThis)
-                {
-                    if (waypoints != null && waypointIndex < waypoints.Length)
-                    {
-                        float step = speed * Time.deltaTime;
-                        transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-                        if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
-                        {
-                            waypointIndex++;
-                        }
-                    }
-                }
-            }
-
-            if (attackCDtimer <= 0)
-            {
-                targetpos = target.position;
-                enemyShot.StartShot();
-            }
+            yield return null; // Wait for the next frame
         }
-        else
+
+    }
+
+    public IEnumerator Chasing()
+    {
+        anim.SetBool("isAttacking", false); // Reset attack animation when chasing starts
+        agent.stoppingDistance = stopDistance; // Set the stopping distance for the NavMeshAgent
+        StopCoroutine(Roaming()); // Stop roaming coroutine if chasing
+        StopCoroutine(Waiting()); // Stop waiting coroutine if chasing
+        isAttack = false; // Reset attack flag when chasing starts
+
+        while (true)
         {
-            waypoints = pathfinding.FindPatch(transform.position, lastPlayerPosition);
+            //Debug.Log("widzi"+work);
+            if (target != null)
+            {
+
+                float distanceToPlayer = Vector2.Distance(currentPosition, target.position);
+
+                if (distanceToPlayer > stopDistance)
+                {
+                    agent.isStopped = false;
+                    agent.SetDestination(target.position);
+                }
+                else
+                {
+                    agent.isStopped = true; // Zatrzymaj ruch agenta
+                    rb.velocity = Vector2.zero; // Dla pewnoœci zatrzymaj Rigidbody2D
+                }
+
+
+                if (attackCDtimer <= 0)
+            {
+                    agent.isStopped = true; // Zatrzymaj ruch agenta
+                    rb.velocity = Vector2.zero; // Dla pewnoœci zatrzymaj Rigidbody2D
+                    isAttack = true; // Set attack flag when close enough to the player
+                    targetpos = target.position;
+                    state = State.Attacking; // If close enough to the player, switch to waiting state
+                    enemyShot.StartShot();
+                    yield break;
+            }
         }
 
         if (!inThis)
         {
-            if (waypoints != null && waypointIndex < waypoints.Length)
-            {
-                float step = speed * Time.deltaTime;
-                transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
+                //Debug.Log("niewidzi" + work);
+                agent.isStopped = false;
+                agent.stoppingDistance = 0f;
+                agent.SetDestination(lastPlayerPosition); // Set the destination to the last known player position
 
-                if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
+                if (Vector2.Distance(transform.position, lastPlayerPosition) < .1f)
                 {
-                    waypointIndex++;
+
+                    roamPosition = Vector2.zero; // Reset roam position when returning
+                                                 //state = State.Returning; // wraca do miejsca startowego trza zrobic
+                    waypoints = null; // Clear waypoints when returning
+                    waypointIndex = 0; // Reset the waypoint index when returning
+                    state = State.Roaming; // Idzie do innego miejsca w patrolu
+                    StartCoroutine(Roaming()); // Start roaming again after returning
+                    chasing = false; // Reset chasing flag when returning to last known position
+                    yield break; // Exit the coroutine when the enemy has returned to the last known player position
                 }
             }
-
-            if (waypoints != null && waypointIndex >= waypoints.Length)
-            {
-                roamPosition = Vector2.zero;
-                waypoints = null;
-                waypointIndex = 0;
-                state = State.Roaming;
-            }
+            yield return null;
         }
     }
 

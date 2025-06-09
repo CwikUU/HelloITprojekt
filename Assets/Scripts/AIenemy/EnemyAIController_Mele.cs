@@ -193,35 +193,6 @@ public class EnemyAIController_Mele : MonoBehaviour
             yield return null; // Wait for the next frame
         }
 
-        //if (waypoints != null && waypointIndex < waypoints.Length)
-        //{
-
-        //    float step = speed * Time.deltaTime;
-        //    transform.position = Vector2.MoveTowards(currentPosition, waypoints[waypointIndex], step);
-        //    //Debug.Log("Enemy is roaming towards waypoint: " + waypointIndex + " at position: " + waypoints[waypointIndex]);
-        //if (Vector2.Distance(currentPosition, waypoints[waypointIndex]) < 0.1f)
-        //    {
-        //        waypointIndex++;
-        //        //Debug.Log("Enemy has reached the waypoint: " + waypointIndex);
-        //    }
-
-        //    if (Vector2.Distance(currentPosition, roamPosition) < 0.1f)
-        //    {
-
-
-        //    }
-        //}
-
-        //if (waypoints != null && waypointIndex >= waypoints.Length)
-        //{
-        //Debug.Log("Enemy has reached the roaming position.");
-        //state = State.Waiting;
-        //if (waitingCoroutine == null)
-        //    waitingCoroutine = StartCoroutine(Waiting());
-        //waypoints = null;
-        //}
-
-
     }
 
     public IEnumerator Chasing()

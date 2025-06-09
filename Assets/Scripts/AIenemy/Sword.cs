@@ -5,7 +5,7 @@ using UnityEngine;
 public class Sword : MonoBehaviour
 {
     [SerializeField] private bool Player;
-
+    private float timer = 0f;
     private Collider2D sword;
 
     private void Start()
@@ -13,7 +13,10 @@ public class Sword : MonoBehaviour
         sword = GetComponent<Collider2D>();
         sword.enabled = false; // Disable the sword collider initially
     }
-
+    private void Update()
+    {
+        timer += Time.deltaTime;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (Player)
@@ -30,6 +33,7 @@ public class Sword : MonoBehaviour
         }
         else
         {
+            Debug.Log(timer);
             if (collision.CompareTag("Player"))
             {
                 Player_Health playerHealth = collision.GetComponent<Player_Health>();
