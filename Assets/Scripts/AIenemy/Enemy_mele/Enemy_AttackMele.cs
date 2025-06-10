@@ -59,7 +59,7 @@ public class Enemy_AttackMele : MonoBehaviour
             attackTimer = attackCooldown;
         }
 
-        if (giant && throwTimer <= 0 && melController.distanceToPlayer <= throwDistance)
+        if (giant && throwTimer <= 0 && melController.distanceToPlayer >= throwDistance)
         {
             melController.StopAllCoroutines();
             melController.rb.velocity = Vector2.zero; // Stop the enemy's movement

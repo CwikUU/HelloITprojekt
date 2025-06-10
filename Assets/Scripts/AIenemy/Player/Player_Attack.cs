@@ -26,7 +26,7 @@ public class Player_Attack : MonoBehaviour
             attackCooldownTimer -= Time.deltaTime;
         }
 
-        if (Input.GetMouseButtonDown(0)&& attackCooldown<=0 )//
+        if (Input.GetMouseButtonDown(0)&& attackCooldownTimer <= 0 )//
         {
             animator.SetBool("isAttacking", true);
         }

@@ -10,6 +10,7 @@ public class Player_Health : MonoBehaviour
     public int maxHealth = 5;
     private int currentHealth;
     private Vector2 startPos;
+    [HideInInspector] public bool Died = false; // Variable to track if the player has died
 
     private GameObject player;
     public TMP_Text healtText;
@@ -35,13 +36,12 @@ public class Player_Health : MonoBehaviour
 
     private void Die()
     {
-        EnemyAIController_Mele enemy = FindObjectOfType<EnemyAIController_Mele>();
-        enemy.StopAllCoroutines();
-        enemy.StartCoroutine(enemy.Waiting());
+        
+        Died=true;
+        Debug.Log("Player has diedahsdgjashjdsadghgjadsjgasdhgasdjhhjasdhgasdhgsadhgsadghasdgh");
         currentHealth = maxHealth;
         healtText.text = "HP: " + currentHealth;
         player.transform.position = startPos; // Resetuj pozycjê gracza
-
 
     }
 }

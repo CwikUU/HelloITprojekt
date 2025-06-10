@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class rock : MonoBehaviour
+public class Spear : MonoBehaviour
 {
  
     // Start is called before the first frame update

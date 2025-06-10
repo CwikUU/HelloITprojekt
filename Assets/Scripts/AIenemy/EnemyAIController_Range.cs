@@ -49,10 +49,12 @@ public class EnemyAIController_Range : MonoBehaviour
     private Rigidbody2D rb;
     [HideInInspector] public bool chasing = false;
     [HideInInspector] public bool isAttack = false;// Flag to check if the enemy is currently chasing the player
-
+    private bool playerDied = false; // Flag to check if the player has died
+    private Player_Health playerHealth;
 
     private void Awake()
     {
+        playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<Player_Health>();
         enemyShot = GetComponent<Enemy_AttackShot>();
         lastPlayerPosition = transform.position;
         state = State.Roaming;
@@ -73,6 +75,7 @@ public class EnemyAIController_Range : MonoBehaviour
 
     private void Update()
     {
+        playerDied = playerHealth.Died;
         currentPosition = transform.position;
         CheckForPlayer(); // Check for player in the trigger area
 
@@ -226,6 +229,18 @@ public class EnemyAIController_Range : MonoBehaviour
                 agent.isStopped = false;
                 agent.stoppingDistance = 0f;
                 agent.SetDestination(lastPlayerPosition); // Set the destination to the last known player position
+
+                if (playerDied)
+                {
+                    playerDied = false; // Reset the playerDied flag
+                    roamPosition = Vector2.zero; // Reset roam position when returning
+
+                    state = State.Roaming; // Idzie do innego miejsca w patrolu
+                    StartCoroutine(Roaming()); // Start roaming again after returning
+                    chasing = false; // Reset chasing flag when returning to last known position
+
+                    yield break; // Exit the coroutine when the enemy has returned to the last known player position
+                }
 
                 if (Vector2.Distance(transform.position, lastPlayerPosition) < .1f)
                 {

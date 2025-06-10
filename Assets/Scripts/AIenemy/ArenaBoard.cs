@@ -5,12 +5,15 @@ using UnityEngine;
 public class ArenaBoard : MonoBehaviour
 {
     [SerializeField] private GameObject arenaSpawn;
+    [SerializeField] private GameObject Menu;
+    [SerializeField] private GameObject Spawner;
     private bool interact = false;
 
 
     private void Start()
     {
         arenaSpawn.SetActive(false);
+        Spawner.SetActive(false); // Ensure the Spawner is inactive at the start
     }
 
     private void Update()
@@ -20,7 +23,8 @@ public class ArenaBoard : MonoBehaviour
             arenaSpawn.SetActive(!arenaSpawn.activeSelf);
             if (arenaSpawn.activeSelf)
             {
-                // Additional logic when the arena is activated can be added here
+                Menu.SetActive(true);
+                Spawner.SetActive(false);
             }
         }
     }
@@ -39,6 +43,14 @@ public class ArenaBoard : MonoBehaviour
         {
             interact = false;
             arenaSpawn.SetActive(false);
+            Menu.SetActive(true);
+            Spawner.SetActive(false); 
         }
+    }
+
+    public void OpenSpawn()
+    {
+        Menu.SetActive(false); // Optionally deactivate the menu if needed
+        Spawner.SetActive(true); // Activate the Spawner when the button is pressed
     }
 }

@@ -47,7 +47,8 @@ public class Enemy_AttackShot : MonoBehaviour
         target = rangeAIController.targetpos;
         Vector2 direction = (target - (Vector2)shotPoint.position).normalized; // Calculate the direction to the target
         direction = direction.normalized;
-        GameObject rock = Instantiate(projectilePrefab, shotPoint.position, Quaternion.identity); // Instantiate the projectile at the shot point
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg; // Calculate the angle in degrees
+        GameObject rock = Instantiate(projectilePrefab, shotPoint.position, Quaternion.Euler(new Vector3(0,0,angle))); // Instantiate the projectile at the shot point
         rock.GetComponent<Rigidbody2D>().velocity = direction * projectileSpeed; // Set the projectile's velocity
         rangeAIController.state = EnemyAIController_Range.State.Chasing; // Reset state to chasing after shooting
         StartCoroutine(rangeAIController.Chasing());

@@ -57,10 +57,13 @@ public class EnemyAIController_Mele : MonoBehaviour
     private float tranZ; // Variable to store the current rotation around the Z-axis
     private bool work;
     public float distanceToPlayer; // Variable to store the distance to the player
+    private bool playerDied = false; // Flag to check if the player has died
+    private Player_Health playerHealth; // Reference to the Player_Health script to check if the player has died
 
 
     private void Awake()
     {
+        playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<Player_Health>();
         enemyAttack = GetComponentInChildren<Enemy_AttackMele>();
         lastPlayerPosition = transform.position;
         state = State.Roaming;
@@ -81,6 +84,7 @@ public class EnemyAIController_Mele : MonoBehaviour
 
     private void Update()
     {
+        playerDied = playerHealth.Died; // Update the playerDied flag from the Player_Health script
         currentPosition = transform.position;
         //EnemyRoutine();
         CheckForPlayer(); // Check for player in the trigger area
@@ -235,12 +239,24 @@ public class EnemyAIController_Mele : MonoBehaviour
                 agent.isStopped = false;
                 agent.stoppingDistance = 0f;
                 agent.SetDestination(lastPlayerPosition); // Set the destination to the last known player position
+                Debug.Log(playerDied);
+
+                if (playerDied)
+                {
+                    playerDied = false; // Reset the playerDied flag
+                    roamPosition = Vector2.zero; // Reset roam position when returning
+
+                    state = State.Roaming; // Idzie do innego miejsca w patrolu
+                    StartCoroutine(Roaming()); // Start roaming again after returning
+                    chasing = false; // Reset chasing flag when returning to last known position
+
+                    yield break; // Exit the coroutine when the enemy has returned to the last known player position
+                }
 
                 if (Vector2.Distance(transform.position, lastPlayerPosition) < .1f)
                 {
-                    
                     roamPosition = Vector2.zero; // Reset roam position when returning
-                                                
+
                     state = State.Roaming; // Idzie do innego miejsca w patrolu
                     StartCoroutine(Roaming()); // Start roaming again after returning
                     chasing = false; // Reset chasing flag when returning to last known position

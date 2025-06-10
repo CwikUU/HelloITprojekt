@@ -9,8 +9,8 @@ public class ArenaSpawnerController : MonoBehaviour
     [SerializeField] private TMP_Text range;
     [SerializeField] private GameObject melePrefab; // Prefab of the enemy to spawn
     [SerializeField] private GameObject rangePrefab; // Prefab of the enemy to spawn
-    [SerializeField] private LayerMask unwalkableMask; // Layer mask for unwalkable areas
-    [SerializeField] private float howFarX, howFarY; // Distance from the center of the grid to spawn enemies
+    [SerializeField] public LayerMask unwalkableMask; // Layer mask for unwalkable areas
+    [SerializeField] public float howFarX, howFarY; // Distance from the center of the grid to spawn enemies
 
     private int meleCount = 0; // Counter for melee enemies
     private int rangeCount = 0; // Counter for ranged enemies

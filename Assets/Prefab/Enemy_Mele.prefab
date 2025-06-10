@@ -42,11 +42,11 @@ GameObject:
   m_Component:
   - component: {fileID: 3484949246987767177}
   - component: {fileID: 8162472599301950040}
-  - component: {fileID: 7364743200383058537}
   - component: {fileID: 470849534130689003}
-  - component: {fileID: 5551839207563599505}
-  - component: {fileID: 7528682873614539776}
   - component: {fileID: 8772871383905011515}
+  - component: {fileID: 5551839207563599505}
+  - component: {fileID: 7364743200383058537}
+  - component: {fileID: 7528682873614539776}
   - component: {fileID: 7649091335745267330}
   - component: {fileID: 1952559380545606956}
   m_Layer: 8
@@ -124,18 +124,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7364743200383058537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3459029643142237409}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01ef148e557019641bceb1a140691409, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!95 &470849534130689003
 Animator:
   serializedVersion: 5
@@ -157,6 +145,33 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!50 &8772871383905011515
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3459029643142237409}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 1
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!58 &5551839207563599505
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -192,6 +207,25 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &7364743200383058537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3459029643142237409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01ef148e557019641bceb1a140691409, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mele: 1
+  attackCooldown: 1.5
+  giant: 0
+  throwCooldown: 0
+  throwDistance: 0
+  boulderPrefab: {fileID: 0}
+  stunTime: 0
 --- !u!114 &7528682873614539776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,35 +238,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59852d65ed8b390499f336d7a20bc5a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
-  untouchable: 1
---- !u!50 &8772871383905011515
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3459029643142237409}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
+  maxHealth: 4
+  untouchable: 0.5
 --- !u!114 &7649091335745267330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +258,8 @@ MonoBehaviour:
   howFarX: 19
   howFarY: 17
   stopDistance: 1.7
+  enemyPOV: 5
+  whenSeePlayer: 5
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -267,7 +276,9 @@ MonoBehaviour:
   agent: {fileID: 0}
   chasing: 0
   isAsttack: 0
+  rb: {fileID: 0}
   body: {fileID: 5294145676351813666}
+  distanceToPlayer: 0
 --- !u!195 &1952559380545606956
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -434,6 +445,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Player: 0
+  isGiant: 0
+  isMele: 1
+  Stune: 0
 --- !u!1 &8790645774232998896
 GameObject:
   m_ObjectHideFlags: 0

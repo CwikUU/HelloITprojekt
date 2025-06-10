@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5151998846790139189}
   - component: {fileID: 6307495621284889236}
-  - component: {fileID: 7124062085694379395}
   - component: {fileID: 3767715720276004411}
-  - component: {fileID: 559836490106769687}
   - component: {fileID: 3262652000481149488}
+  - component: {fileID: 7124062085694379395}
+  - component: {fileID: 559836490106769687}
   - component: {fileID: 7675168741892492320}
   - component: {fileID: 4925398730326730421}
   - component: {fileID: 8110700725168325905}
@@ -92,25 +92,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7124062085694379395
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1123735103619390367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01ef148e557019641bceb1a140691409, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mele: 1
-  attackCooldown: 3
-  giant: 1
-  throwCooldown: 3
-  throwDistance: 5
-  boulderPrefab: {fileID: 3915197722318385427, guid: 055ba488601317e4e9c2e67b41af870b, type: 3}
-  stunTime: 2
 --- !u!58 &3767715720276004411
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -146,20 +127,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &559836490106769687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1123735103619390367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59852d65ed8b390499f336d7a20bc5a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 3
-  untouchable: 1
 --- !u!50 &3262652000481149488
 Rigidbody2D:
   serializedVersion: 4
@@ -187,6 +154,39 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &7124062085694379395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123735103619390367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01ef148e557019641bceb1a140691409, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mele: 1
+  attackCooldown: 4.5
+  giant: 1
+  throwCooldown: 3
+  throwDistance: 5
+  boulderPrefab: {fileID: 3915197722318385427, guid: 055ba488601317e4e9c2e67b41af870b, type: 3}
+  stunTime: 2
+--- !u!114 &559836490106769687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123735103619390367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59852d65ed8b390499f336d7a20bc5a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 25
+  untouchable: 0.5
 --- !u!114 &7675168741892492320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,7 +205,7 @@ MonoBehaviour:
   howFarX: 19
   howFarY: 17
   stopDistance: 3
-  enemyPOV: 5
+  enemyPOV: 6
   whenSeePlayer: 8
   wallLayer:
     serializedVersion: 2
@@ -223,6 +223,7 @@ MonoBehaviour:
   agent: {fileID: 0}
   chasing: 0
   isAsttack: 0
+  rb: {fileID: 0}
   body: {fileID: 3232300424419889522}
   distanceToPlayer: 0
 --- !u!195 &4925398730326730421

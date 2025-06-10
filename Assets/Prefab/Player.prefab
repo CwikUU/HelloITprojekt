@@ -143,6 +143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5eafa8c4c1525ac42b49931ebd5e74a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Player: 1
+  isGiant: 0
+  isMele: 0
+  Stune: 0
 --- !u!1 &6701671933216888639
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,7 +312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e3ccd511eb2cf748ba660affae89bdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown: 0.5
+  attackCooldown: 0.8
 --- !u!114 &8517263817330983851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,7 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 005fd7b5e04791142a8a9d0ed48168e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
+  maxHealth: 15
   healtText: {fileID: 0}
 --- !u!114 &4065323830754792465
 MonoBehaviour:
@@ -340,6 +344,7 @@ MonoBehaviour:
   animator: {fileID: 4682958584416773610}
   rollCD: 3
   rollActive: {fileID: 0}
+  stuneTimer: 0
 --- !u!95 &4682958584416773610
 Animator:
   serializedVersion: 5
