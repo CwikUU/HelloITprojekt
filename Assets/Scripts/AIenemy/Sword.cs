@@ -6,6 +6,7 @@ public class Sword : MonoBehaviour
 {
     [SerializeField] private bool Player;
     [HideInInspector] public bool isGiant;
+    [SerializeField] private bool isMele;
     private float timer = 0f;
     private Collider2D sword;
     [HideInInspector]public bool Stune = false;
@@ -33,7 +34,8 @@ public class Sword : MonoBehaviour
                 }
             }
         }
-        else
+        
+        if(isMele)
         {
             if (collision.CompareTag("Player"))
             {
@@ -51,17 +53,31 @@ public class Sword : MonoBehaviour
 
             if (collision.CompareTag("Player"))
             {
-                
+
                 if (Stune)
                 {
-
+                    Player_Movement playerMovement = collision.GetComponent<Player_Movement>();
+                    Enemy_AttackMele enemyAttack = GetComponentInParent<Enemy_AttackMele>();
+                    playerMovement.stuneTimer = enemyAttack.stunTime; // Stun the player for 1 second
+                    Debug.Log("Player stunned for: " + enemyAttack.stunTime + " seconds");
+                    Player_Health playerHealth = collision.GetComponent<Player_Health>();
+                    if (playerHealth != null)
+                    {
+                        playerHealth.TakeDamage(2); // Deal more damage for giant sword
+                    }
+                    sword.enabled = false; // Disable the sword collider after hitting the player
                 }
-                Player_Health playerHealth = collision.GetComponent<Player_Health>();
-                if (playerHealth != null)
+                else
                 {
-                    playerHealth.TakeDamage(2); // Deal more damage for giant sword
+                    Player_Health playerHealth = collision.GetComponent<Player_Health>();
+                    if (playerHealth != null)
+                    {
+                        playerHealth.TakeDamage(4); // Deal more damage for giant sword
+                    }
+                    sword.enabled = false;
                 }
-                sword.enabled = false; // Disable the sword collider after hitting the player
+
+                
             }
         }
     }

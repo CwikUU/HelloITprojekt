@@ -35,7 +35,10 @@ public class Player_Health : MonoBehaviour
 
     private void Die()
     {
-        currentHealth = 5;
+        EnemyAIController_Mele enemy = FindObjectOfType<EnemyAIController_Mele>();
+        enemy.StopAllCoroutines();
+        enemy.StartCoroutine(enemy.Waiting());
+        currentHealth = maxHealth;
         healtText.text = "HP: " + currentHealth;
         player.transform.position = startPos; // Resetuj pozycjê gracza
 

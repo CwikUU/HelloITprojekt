@@ -9,6 +9,7 @@ public class Enemy_AttackMele : MonoBehaviour
     [SerializeField] private bool giant = false;
     [SerializeField] private float throwCooldown;
     [SerializeField] private float throwDistance;
+    [SerializeField] private GameObject boulderPrefab;
     [SerializeField] public float stunTime;
     [HideInInspector] private bool canStunned = false;
 
@@ -50,6 +51,7 @@ public class Enemy_AttackMele : MonoBehaviour
     {
         if (mele && attackTimer <= 0 && melController.distanceToPlayer <= melController.stopDistance)
         {
+            melController.StopAllCoroutines();
             melController.agent.isStopped = true;
             melController.isAsttack = true;
             targetPosition = melController.targetpos;
@@ -59,6 +61,10 @@ public class Enemy_AttackMele : MonoBehaviour
 
         if (giant && throwTimer <= 0 && melController.distanceToPlayer <= throwDistance)
         {
+            melController.StopAllCoroutines();
+            melController.rb.velocity = Vector2.zero; // Stop the enemy's movement
+            melController.agent.isStopped = true;
+            melController.isAsttack = true;
             animator.SetBool("isThrowing", true);
             throwTimer = throwCooldown;
         }
@@ -97,5 +103,15 @@ public class Enemy_AttackMele : MonoBehaviour
     {
         canStunned = !canStunned;
         sword.Stune = canStunned;
+    }
+
+    public void Throw()
+    {
+        animator.SetBool("isThrowing", false);
+        Instantiate(boulderPrefab, melController.targetpos, Quaternion.identity);
+        melController.agent.isStopped = false;
+        melController.isAsttack = false;
+        melController.state = EnemyAIController_Mele.State.Chasing;
+        StartCoroutine(melController.Chasing());
     }
 }

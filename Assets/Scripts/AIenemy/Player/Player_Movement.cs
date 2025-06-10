@@ -27,23 +27,18 @@ public class Player_Movement : MonoBehaviour
         if (stuneTimer > 0)
         {
             stuneTimer -= Time.fixedDeltaTime;
+            Debug.Log("Stunned for: " + stuneTimer + " seconds");
         }
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        //if (horizontal > 0 && transform.localScale.x < 0 ||
-        //   horizontal < 0 && transform.localScale.x > 0)
-        //{
-        //    Vector3 scale = transform.localScale;
-        //    scale.x *= -1;
-        //    transform.localScale = scale;
-        //}
-
-        animator.SetFloat("horizontal", Mathf.Abs(horizontal));
-        animator.SetFloat("vertical", Mathf.Abs(vertical));
 
         if (stuneTimer <= 0)
         {
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
+
+            animator.SetFloat("horizontal", Mathf.Abs(horizontal));
+            animator.SetFloat("vertical", Mathf.Abs(vertical));
+
+
             rb.velocity = new Vector2(horizontal, vertical) * speed;
 
             if (rollCd > 0)
@@ -65,6 +60,12 @@ public class Player_Movement : MonoBehaviour
             Vector2 direction = (mouseWorldPosition - rb.position).normalized;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             rb.rotation = angle;
+        }
+        else
+        {
+            rb.velocity = Vector2.zero; // Stop movement when stunned
+            animator.SetFloat("horizontal", 0);
+            animator.SetFloat("vertical", 0);
         }
     }
 

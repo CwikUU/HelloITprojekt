@@ -24,6 +24,12 @@ public class EnemyAIController_Mele : MonoBehaviour
     [SerializeField] private float howFarX, howFarY;// How far the enemy can roam from the start position
     [Range(0, 5)]
     [SerializeField] public float stopDistance;
+    [Header("EnemyPOV")]
+    [SerializeField] private float enemyPOV; // Field of view angle for the enemy
+    [SerializeField] private float whenSeePlayer; // Distance at which the enemy will start chasing the player
+    private float pov;
+
+    [Header("")]
     [SerializeField] private LayerMask wallLayer;
     private Enemy_AttackMele enemyAttack;
     public GameObject player;
@@ -46,7 +52,7 @@ public class EnemyAIController_Mele : MonoBehaviour
     [HideInInspector]public NavMeshAgent agent;
     [HideInInspector]public bool chasing = false;
     [HideInInspector]public bool isAsttack = false;// Flag to check if the enemy is currently chasing the player
-    Rigidbody2D rb;
+    [HideInInspector] public Rigidbody2D rb;
     public Transform body;
     private float tranZ; // Variable to store the current rotation around the Z-axis
     private bool work;
@@ -70,6 +76,7 @@ public class EnemyAIController_Mele : MonoBehaviour
         StartCoroutine(Roaming()); // Start the roaming coroutine when the enemy AI starts
         agent.updateRotation = false; // Disable automatic rotation of the NavMeshAgent
         agent.speed = speed; // Set the speed of the NavMeshAgent
+        pov = enemyPOV;
     }
 
     private void Update()
@@ -112,7 +119,7 @@ public class EnemyAIController_Mele : MonoBehaviour
 
     private void CheckForPlayer()
     {
-        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 5f, playerLayer);
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, pov, playerLayer);
         if (hitColliders.Length > 0)
         {
             Transform playerTransform = hitColliders[0].transform;
@@ -120,6 +127,7 @@ public class EnemyAIController_Mele : MonoBehaviour
             if (hit.collider == null)
             {
                 inThis = true;
+                pov = whenSeePlayer;
                 if (!chasing)
                 {
                     chasing = true; // Set chasing flag to true when the player is detected
@@ -139,6 +147,7 @@ public class EnemyAIController_Mele : MonoBehaviour
 
         if (hitColliders.Length == 0)
         {
+            pov = enemyPOV;
             if(target!=null) lastPlayerPosition = new Vector2(target.position.x, target.position.y);
             target = null;
             inThis = false;
@@ -146,7 +155,7 @@ public class EnemyAIController_Mele : MonoBehaviour
         }
     }
 
-    private IEnumerator Waiting()
+    public IEnumerator Waiting()
     {
         StopCoroutine(Roaming()); // Stop roaming coroutine if waiting
         yield return new WaitForSeconds(waitTime); // Czekaj okreœlony czas
