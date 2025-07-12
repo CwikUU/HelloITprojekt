@@ -1,17 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy_AttackMele : MonoBehaviour
 {
+    [Header("Normal Goblin")]
     [SerializeField] private bool mele = false;
     [SerializeField] private float attackCooldown;
+
+    [Header("Giant Goblin")]
     [SerializeField] private bool giant = false;
     [SerializeField] private float throwCooldown;
     [SerializeField] private float throwDistance;
     [SerializeField] private GameObject boulderPrefab;
     [SerializeField] public float stunTime;
     [HideInInspector] private bool canStunned = false;
+
+    [Header("Normal Wolf")]
+    [SerializeField] private bool wolf = false;
+    [SerializeField] private float wolfAttackCooldown;
+    [SerializeField] private float wolfAttackDashChargingTime;
+    [SerializeField] private float wolfAttackDashTime;
+    [SerializeField] private float wolfAttackDashSpeed;
 
     private float attackTimer = 0f;
     private float throwTimer = 0f;
@@ -27,10 +38,13 @@ public class Enemy_AttackMele : MonoBehaviour
     {
         melController = GetComponent<EnemyAIController_Mele>();
         animator = GetComponent<Animator>();
-        sword = GetComponentInChildren<Sword>();
-        swordCollider = sword.GetComponent<Collider2D>();
+        if (!wolf)
+        {
+            sword = GetComponentInChildren<Sword>();
+            swordCollider = sword.GetComponent<Collider2D>();
+            sword.isGiant = giant;  
+        }
         rb = GetComponent<Rigidbody2D>();
-        sword.isGiant = giant;
     }
 
     void Update()
@@ -68,10 +82,41 @@ public class Enemy_AttackMele : MonoBehaviour
             animator.SetBool("isThrowing", true);
             throwTimer = throwCooldown;
         }
+
+        if (wolf && attackTimer <= 0 && melController.distanceToPlayer <= melController.stopDistance)
+        {
+            melController.StopAllCoroutines();
+            melController.agent.isStopped = true;
+            melController.isAsttack = true;
+            attackTimer = wolfAttackCooldown;
+            // Perform a dash towards the player
+            
+            StartCoroutine(WolfAttackDash());
+        }
+    }
+
+    private IEnumerator WolfAttackDash()
+    {
+        melController.agent.isStopped = true;
+        Debug.Log("Wolf Attack Dash Started");
+        melController.StopAllCoroutines();
+        melController.agent.isStopped = true;
+        yield return new WaitForSeconds(wolfAttackDashChargingTime);
+        targetPosition =(Vector2)melController.target.position;
+        Vector2 direction = (targetPosition - (Vector2)melController.transform.position).normalized;
+        rb.velocity = direction * wolfAttackDashSpeed;
+        yield return new WaitForSeconds(wolfAttackDashTime);
+        rb.velocity = Vector2.zero; // Stop the dash movement
+        melController.agent.isStopped = false; // Resume movement
+        melController.isAsttack = false; // Reset attack state
+        melController.target = null;
+        StartCoroutine(melController.Chasing()); // Resume chasing state
+        Debug.Log("Wolf Attack Dash Ended");
     }
 
     public void DrawSword()
     {
+        if (sword == null) return; // Ensure sword is not null
         if (swordCollider.enabled == true)
         {
             swordCollider.enabled = false; // Disable the sword collider

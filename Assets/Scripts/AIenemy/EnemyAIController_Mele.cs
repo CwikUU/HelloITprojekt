@@ -39,13 +39,11 @@ public class EnemyAIController_Mele : MonoBehaviour
     private Vector2 roamPosition;
     private Vector2 currentPosition;
     private Vector2 lastPlayerPosition;
-    private Transform target;
+    [HideInInspector]public Transform target;
     private bool inThis = false;
     private Animator anim;
     float lastX;
     [SerializeField] private Transform sword;
-    [SerializeField] public float attackCD;
-    [HideInInspector] public float attackCDtimer;
     private Coroutine waitingCoroutine;
     [SerializeField] private bool arena;
     [HideInInspector] public Vector2 targetpos;
@@ -53,7 +51,6 @@ public class EnemyAIController_Mele : MonoBehaviour
     [HideInInspector]public bool chasing = false;
     [HideInInspector]public bool isAsttack = false;// Flag to check if the enemy is currently chasing the player
     [HideInInspector] public Rigidbody2D rb;
-    public Transform body;
     private float tranZ; // Variable to store the current rotation around the Z-axis
     private bool work;
     public float distanceToPlayer; // Variable to store the distance to the player
@@ -91,6 +88,7 @@ public class EnemyAIController_Mele : MonoBehaviour
 
         if (!isAsttack)
         {
+            
             anim.SetBool("isAttacking", false);
             if (target != null)
             {
@@ -239,7 +237,7 @@ public class EnemyAIController_Mele : MonoBehaviour
                 agent.isStopped = false;
                 agent.stoppingDistance = 0f;
                 agent.SetDestination(lastPlayerPosition); // Set the destination to the last known player position
-                Debug.Log(playerDied);
+                //Debug.Log(playerDied);
 
                 if (playerDied)
                 {
