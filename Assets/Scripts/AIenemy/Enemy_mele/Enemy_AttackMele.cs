@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Xml.Serialization;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class Enemy_AttackMele : MonoBehaviour
 {
@@ -18,15 +21,22 @@ public class Enemy_AttackMele : MonoBehaviour
     [HideInInspector] private bool canStunned = false;
 
     [Header("Normal Wolf")]
-    [SerializeField] private bool wolf = false;
-    [SerializeField] private float wolfAttackCooldown;
-    [SerializeField] private float wolfAttackDashChargingTime;
-    [SerializeField] private float wolfAttackDashTime;
-    [SerializeField] private float wolfAttackDashSpeed;
+    [SerializeField] public bool wolf = false;
+    [SerializeField] private bool dashAttack = false;
+    [SerializeField] private float attackCooldownWolf;
+    [SerializeField] private float attackDashChargingTimeWolf;
+    [SerializeField] private float attackDashSpeedWolf;
+    public Transform point;
 
     private float attackTimer = 0f;
     private float throwTimer = 0f;
-    private Vector2 targetPosition;
+    private Transform targetPosition;
+    private Vector2 behindPoint;
+    private Vector2 dashPosition;
+    private Vector2 targetPos;
+    private List<Vector2> dashPoints = new List<Vector2>();
+    private int totalDashPoints = 25;
+    private int dashPointIndex = 0;
 
     private Animator animator;
     private Sword sword;
@@ -42,7 +52,7 @@ public class Enemy_AttackMele : MonoBehaviour
         {
             sword = GetComponentInChildren<Sword>();
             swordCollider = sword.GetComponent<Collider2D>();
-            sword.isGiant = giant;  
+            sword.isGiant = giant;
         }
         rb = GetComponent<Rigidbody2D>();
     }
@@ -59,8 +69,13 @@ public class Enemy_AttackMele : MonoBehaviour
             throwTimer -= Time.deltaTime;
         }
 
+       
     }
 
+    private void FixedUpdate()
+    {
+
+    }
     public void Attack()
     {
         if (mele && attackTimer <= 0 && melController.distanceToPlayer <= melController.stopDistance)
@@ -68,7 +83,7 @@ public class Enemy_AttackMele : MonoBehaviour
             melController.StopAllCoroutines();
             melController.agent.isStopped = true;
             melController.isAsttack = true;
-            targetPosition = melController.targetpos;
+            targetPos = melController.targetpos;
             animator.SetBool("isAttacking", true);
             attackTimer = attackCooldown;
         }
@@ -86,32 +101,92 @@ public class Enemy_AttackMele : MonoBehaviour
         if (wolf && attackTimer <= 0 && melController.distanceToPlayer <= melController.stopDistance)
         {
             melController.StopAllCoroutines();
-            melController.agent.isStopped = true;
-            melController.isAsttack = true;
-            attackTimer = wolfAttackCooldown;
+            attackTimer = attackCooldownWolf;
+            melController.agent.stoppingDistance = 0f; // Disable stopping distance to allow dash attack
             // Perform a dash towards the player
-            
+
             StartCoroutine(WolfAttackDash());
         }
     }
 
     private IEnumerator WolfAttackDash()
     {
-        melController.agent.isStopped = true;
+        float speedWolfDef = melController.agent.speed;
+        //Stopwatch stopwatch = new Stopwatch();
+        //stopwatch.Start();
+
+        melController.end = true;
+
         Debug.Log("Wolf Attack Dash Started");
-        melController.StopAllCoroutines();
-        melController.agent.isStopped = true;
-        yield return new WaitForSeconds(wolfAttackDashChargingTime);
-        targetPosition =(Vector2)melController.target.position;
-        Vector2 direction = (targetPosition - (Vector2)melController.transform.position).normalized;
-        rb.velocity = direction * wolfAttackDashSpeed;
-        yield return new WaitForSeconds(wolfAttackDashTime);
+        yield return new WaitForSeconds(attackDashChargingTimeWolf); 
+
+        melController.isAsttack = true;
+        
+        DashLine(melController.transform.position, point.position);
+        
+        while (Vector2.Distance(melController.transform.position, dashPoints[dashPointIndex]) >= 0.2f)
+        {
+            Debug.Log(Vector2.Distance(melController.transform.position, dashPoints[dashPointIndex]));
+            yield return null; // Wait until the enemy reaches the dash point
+        }
         rb.velocity = Vector2.zero; // Stop the dash movement
-        melController.agent.isStopped = false; // Resume movement
         melController.isAsttack = false; // Reset attack state
         melController.target = null;
+        melController.end = false;
+        melController.agent.stoppingDistance = melController.stopDistance; // Reset stopping distance
         StartCoroutine(melController.Chasing()); // Resume chasing state
+        melController.agent.speed = speedWolfDef; // Reset the agent speed
+        //stopwatch.Stop();
         Debug.Log("Wolf Attack Dash Ended");
+    }
+
+    private void DashLine(Vector2 start,Vector2 end)
+    {
+        dashPoints.Clear();
+        bool canDash = false;
+
+        
+
+        for (int i = 0; i < totalDashPoints; i++)
+        {
+            float t = (float)i / (totalDashPoints - 1);
+            Vector2 point = Vector2.Lerp(start, end, t);
+            dashPoints.Add(point);
+        }
+
+        if (dashPoints.Count == 0)
+        {
+            dashPointIndex = 0; // Reset the dash point index if the list is empty
+            return; // Exit if there are no dash points
+        }
+
+        for (int i = 0; i < dashPoints.Count; i++)
+        {
+            Collider2D hit = Physics2D.OverlapCircle(dashPoints[i], 1f, LayerMask.GetMask("Collision"));
+            canDash = (hit == null);
+
+            if (!canDash)
+            {
+                melController.agent.isStopped = false; // Stop the agent if a collision is 
+                melController.agent.speed = attackDashSpeedWolf;
+                int safeIndex = Mathf.Max(0 , i - 1); // Ensure we don't go out of bounds
+                melController.agent.SetDestination(dashPoints[safeIndex]);
+                Debug.DrawLine(dashPoints[0], dashPoints[safeIndex],Color.red,2f);
+                dashPointIndex = safeIndex;
+                break;
+            }else if (i == dashPoints.Count - 1)
+            {
+                melController.agent.isStopped = false;
+                melController.agent.speed = attackDashSpeedWolf;
+                melController.agent.SetDestination(dashPoints[i]);
+                Debug.DrawLine(dashPoints[0], dashPoints[i], Color.red, 2f);
+                dashPointIndex = i;
+            }
+            //if (i < dashPoints.Count - 1)
+            //{
+            //    Debug.DrawLine(dashPoints[i], dashPoints[i + 1], Color.red, 2f);
+            //}
+        }
     }
 
     public void DrawSword()
@@ -127,11 +202,12 @@ public class Enemy_AttackMele : MonoBehaviour
         }
     }
 
+
     public void AttackStep()
     {
         Vector2 direction = (melController.targetpos - (Vector2)melController.transform.position).normalized;
         rb.velocity = direction * melController.speed;
-        if (swordCollider.enabled==false)swordCollider.enabled = true; // Enable the sword collider during the attack step
+        if (swordCollider.enabled == false) swordCollider.enabled = true; // Enable the sword collider during the attack step
     }
 
     public void EndAttack()
@@ -160,3 +236,4 @@ public class Enemy_AttackMele : MonoBehaviour
         StartCoroutine(melController.Chasing());
     }
 }
+

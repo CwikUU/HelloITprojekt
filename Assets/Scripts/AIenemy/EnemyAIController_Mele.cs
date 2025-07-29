@@ -56,7 +56,7 @@ public class EnemyAIController_Mele : MonoBehaviour
     public float distanceToPlayer; // Variable to store the distance to the player
     private bool playerDied = false; // Flag to check if the player has died
     private Player_Health playerHealth; // Reference to the Player_Health script to check if the player has died
-
+    public bool end = false; // Counter for the number of times the enemy has roamed
 
     private void Awake()
     {
@@ -170,6 +170,8 @@ public class EnemyAIController_Mele : MonoBehaviour
 
     private IEnumerator Roaming()
     {
+        
+
         agent.stoppingDistance = 0f; // Reset the stopping distance for the NavMeshAgent
         bool canRoam = false; // Flag to check if a valid roaming position is found
         while (!canRoam)
@@ -203,6 +205,7 @@ public class EnemyAIController_Mele : MonoBehaviour
 
     public IEnumerator Chasing()
     {
+
         anim.SetBool("isAttacking", false); // Reset attack animation when chasing starts
         agent.stoppingDistance = stopDistance; // Set the stopping distance for the NavMeshAgent
         StopCoroutine(Roaming()); // Stop roaming coroutine if chasing
@@ -211,6 +214,8 @@ public class EnemyAIController_Mele : MonoBehaviour
 
         while (true)
         {
+            if(end) yield break; // Exit the coroutine if end is true
+
             if (target != null)
             {
 
@@ -228,7 +233,8 @@ public class EnemyAIController_Mele : MonoBehaviour
                 }
                 targetpos = target.position;
                 enemyAttack.Attack();
-                 
+                
+
             }
 
 
@@ -262,7 +268,8 @@ public class EnemyAIController_Mele : MonoBehaviour
                 }
             }
             yield return null;
-        }        
+        }
+        
     }
 
     private void Returning()

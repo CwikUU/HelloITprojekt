@@ -11,9 +11,13 @@ public class Player_Movement : MonoBehaviour
     [SerializeField] Animator animator;
     [SerializeField] private float rollCD = 3; // Cooldown for rolling
     [SerializeField] private Image rollActive;
+    [SerializeField] private Transform rollPoint;
     [HideInInspector] public float stuneTimer; // To check if the player is rolling
+    [SerializeField] private Transform playerTransform;
 
     private float rollCd = 0f;
+    private List<Vector2> rollPoints = new List<Vector2>();
+    private int totalRollPoints = 30;
 
 
     private void Start()
@@ -52,7 +56,7 @@ public class Player_Movement : MonoBehaviour
             if (Input.GetKey(KeyCode.Space) && rollCd <= 0f)
             {
                 rollActive.color = Color.red;
-                StartCoroutine(Roll());
+                Roll(playerTransform.position, rollPoint.position);
                 rollCd = rollCD;
             }
 
@@ -69,13 +73,35 @@ public class Player_Movement : MonoBehaviour
         }
     }
 
-    private IEnumerator Roll()
+    private void Roll(Vector2 start, Vector2 end)
     {
-        float originalSpeed = speed;
-        speed *= 5;
-        yield return new WaitForSeconds(0.1f);
-        speed = originalSpeed;
-        
+        rollPoints.Clear();
+        bool canDash = false;
+
+        for (int i = 0; i < totalRollPoints; i++)
+        {
+            float t = (float)i / (totalRollPoints - 1);
+            Vector2 point = Vector2.Lerp(start, end, t);
+            rollPoints.Add(point);
+        }
+
+        for (int i = 0; i < rollPoints.Count; i++)
+        {
+            Collider2D hit = Physics2D.OverlapCircle(rollPoints[i], .5f, LayerMask.GetMask("Collision"));
+            canDash = (hit == null);
+
+            if (!canDash)
+            {
+                int safeIndex = Mathf.Max(0, i - 1);
+                playerTransform.position = rollPoints[safeIndex]; // Teleport player to roll point
+                break; // Exit the loop if a collision is detected
+            }
+            else if (i == rollPoints.Count - 1) // If we reach the last point without collision
+            {
+                playerTransform.position = rollPoints[i]; // Teleport player to roll point
+                break;
+            }
+        }
     }
 }
         
