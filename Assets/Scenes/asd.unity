@@ -11117,7 +11117,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -24
+      value: -23.41
       objectReference: {fileID: 0}
     - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
       propertyPath: m_LocalPosition.y
@@ -12157,6 +12157,95 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 885859801}
   m_CullTransparentMesh: 1
+--- !u!1001 &1010929415
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1952559380545606956, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_AutoBraking
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1952559380545606956, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_Acceleration
+      value: 97.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3459029643142237409, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_Name
+      value: Enemy_Wolf (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -16.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484949246987767177, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364743200383058537, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: point
+      value: 
+      objectReference: {fileID: 1323610680}
+    - target: {fileID: 7364743200383058537, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: attackCooldownWolf
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364743200383058537, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: attackDashTimeWolf
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364743200383058537, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: attackDashSpeedWolf
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364743200383058537, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: wolfAttackDashSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364743200383058537, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+      propertyPath: attackDashChargingTimeWolf
+      value: 1.2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
 --- !u!1 &1093255946
 GameObject:
   m_ObjectHideFlags: 0
@@ -41961,6 +42050,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1314152085}
   m_CullTransparentMesh: 1
+--- !u!4 &1323610680 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 590594061143094690, guid: 534fb6d49a450ee43bd33f9de683f211, type: 3}
+  m_PrefabInstance: {fileID: 1010929415}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1328136321
 GameObject:
   m_ObjectHideFlags: 3
@@ -52561,3 +52655,4 @@ SceneRoots:
   - {fileID: 1945602224}
   - {fileID: 20457743}
   - {fileID: 386263009}
+  - {fileID: 1010929415}

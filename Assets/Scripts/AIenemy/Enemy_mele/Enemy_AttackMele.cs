@@ -117,7 +117,7 @@ public class Enemy_AttackMele : MonoBehaviour
 
         melController.end = true;
 
-        Debug.Log("Wolf Attack Dash Started");
+        //Debug.Log("Wolf Attack Dash Started");
         yield return new WaitForSeconds(attackDashChargingTimeWolf); 
 
         melController.isAsttack = true;
@@ -126,7 +126,7 @@ public class Enemy_AttackMele : MonoBehaviour
         
         while (Vector2.Distance(melController.transform.position, dashPoints[dashPointIndex]) >= 0.2f)
         {
-            Debug.Log(Vector2.Distance(melController.transform.position, dashPoints[dashPointIndex]));
+            //Debug.Log(Vector2.Distance(melController.transform.position, dashPoints[dashPointIndex]));
             yield return null; // Wait until the enemy reaches the dash point
         }
         rb.velocity = Vector2.zero; // Stop the dash movement
@@ -137,7 +137,7 @@ public class Enemy_AttackMele : MonoBehaviour
         StartCoroutine(melController.Chasing()); // Resume chasing state
         melController.agent.speed = speedWolfDef; // Reset the agent speed
         //stopwatch.Stop();
-        Debug.Log("Wolf Attack Dash Ended");
+        //Debug.Log("Wolf Attack Dash Ended");
     }
 
     private void DashLine(Vector2 start,Vector2 end)
@@ -171,7 +171,7 @@ public class Enemy_AttackMele : MonoBehaviour
                 melController.agent.speed = attackDashSpeedWolf;
                 int safeIndex = Mathf.Max(0 , i - 1); // Ensure we don't go out of bounds
                 melController.agent.SetDestination(dashPoints[safeIndex]);
-                Debug.DrawLine(dashPoints[0], dashPoints[safeIndex],Color.red,2f);
+                //Debug.DrawLine(dashPoints[0], dashPoints[safeIndex],Color.red,2f);
                 dashPointIndex = safeIndex;
                 break;
             }else if (i == dashPoints.Count - 1)
@@ -179,7 +179,7 @@ public class Enemy_AttackMele : MonoBehaviour
                 melController.agent.isStopped = false;
                 melController.agent.speed = attackDashSpeedWolf;
                 melController.agent.SetDestination(dashPoints[i]);
-                Debug.DrawLine(dashPoints[0], dashPoints[i], Color.red, 2f);
+                //Debug.DrawLine(dashPoints[0], dashPoints[i], Color.red, 2f);
                 dashPointIndex = i;
             }
             //if (i < dashPoints.Count - 1)
